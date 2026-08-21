@@ -40,6 +40,7 @@ Item {
                 Loader {
                     id: cpuCard
 
+                    Layout.fillWidth: true
                     active: Config.dashboard.performance.showCpu
 
                     sourceComponent: HeroCard {
@@ -62,6 +63,7 @@ Item {
                 Loader {
                     id: gpuCard
 
+                    Layout.fillWidth: true
                     active: Config.dashboard.performance.showGpu
 
                     sourceComponent: HeroCard {
@@ -88,6 +90,7 @@ Item {
                 Loader {
                     id: memoryCard
 
+                    Layout.fillWidth: true
                     active: Config.dashboard.performance.showMemory
                     sourceComponent: GaugeCard {
                         icon: "memory_alt"
@@ -106,6 +109,7 @@ Item {
                 Loader {
                     id: storageCard
 
+                    Layout.fillWidth: true
                     active: Config.dashboard.performance.showStorage
                     sourceComponent: StorageGaugeCard {}
                 }
@@ -114,6 +118,7 @@ Item {
                 Loader {
                     id: networkCard
 
+                    Layout.fillWidth: true
                     active: Config.dashboard.performance.showNetwork
                     sourceComponent: NetworkCard {}
                 }
