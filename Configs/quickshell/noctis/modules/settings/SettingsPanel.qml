@@ -11,21 +11,21 @@ RowLayout {
     property string currentCategory: "appearance"
 
     readonly property var categories: [
-        { id: "appearance", icon: "palette", label: qsTr("Appearance") },
-        { id: "bar", icon: "dock_to_bottom", label: qsTr("Bar") },
-        { id: "clock", icon: "schedule", label: qsTr("Clock / Date") },
-        { id: "osd", icon: "notifications", label: qsTr("OSD / Notifications") },
-        { id: "system", icon: "monitor_heart", label: qsTr("System") },
-        { id: "about", icon: "info", label: qsTr("About") }
+        { id: "appearance", icon: "palette", label: qsTr("Appearance"), description: qsTr("Theme, wallpaper, colors") },
+        { id: "bar", icon: "dock_to_bottom", label: qsTr("Bar"), description: qsTr("Position, density") },
+        { id: "clock", icon: "schedule", label: qsTr("Clock / Date"), description: qsTr("Format, desktop clock") },
+        { id: "osd", icon: "notifications", label: qsTr("OSD / Notifications"), description: qsTr("Sliders, timeouts") },
+        { id: "system", icon: "monitor_heart", label: qsTr("System"), description: qsTr("Doctor, dependencies") },
+        { id: "about", icon: "info", label: qsTr("About"), description: qsTr("Version, credits") }
     ]
 
-    width: 720
+    width: 760
     height: 480
     spacing: 0
 
     StyledRect {
         Layout.fillHeight: true
-        Layout.preferredWidth: 200
+        Layout.preferredWidth: 240
         radius: Tokens.rounding.extraLarge
         color: Colours.tPalette.m3surfaceContainer
 

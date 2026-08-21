@@ -100,6 +100,8 @@ QtObject {
         readonly property color m3primaryOnSurface: root.legibleAccent(m3primary, m3surfaceContainerHigh)
         readonly property color m3secondary: "{{ color7 }}"
         readonly property color m3secondaryOnSurface: root.legibleAccent(m3secondary, m3surfaceContainerHigh)
+        readonly property color m3secondaryContainer: Qt.tint(m3surfaceContainerHigh, Qt.alpha(m3secondary, 0.24))
+        readonly property color m3onSecondaryContainer: root.legibleAccent(m3secondary, m3secondaryContainer)
         readonly property color m3tertiary: "{{ color2 }}"
         readonly property color m3onTertiary: root.contrastOn(m3tertiary)
         readonly property color m3tertiaryOnSurface: root.legibleAccent(m3tertiary, m3surfaceContainerHigh)
