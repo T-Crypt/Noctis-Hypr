@@ -35,12 +35,17 @@ Item {
         id: landingComp
 
         ColumnLayout {
-            spacing: Tokens.spacing.medium
+            spacing: Tokens.spacing.largeIncreased
+
+            StyledText {
+                text: qsTr("Appearance")
+                font: Tokens.font.title.large
+            }
 
             StyledText {
                 text: qsTr("Theme")
                 color: Colours.palette.m3onSurfaceVariant
-                font: Tokens.font.label.builders.medium.weight(Font.Medium).build()
+                font: Tokens.font.label.medium
             }
 
             GridLayout {
@@ -101,10 +106,10 @@ Item {
 
             StyledText {
                 visible: Themes.wallpapersInActiveTheme.length > 1
-                Layout.topMargin: Tokens.spacing.medium
+                Layout.topMargin: Tokens.spacing.small
                 text: qsTr("Wallpaper")
                 color: Colours.palette.m3onSurfaceVariant
-                font: Tokens.font.label.builders.medium.weight(Font.Medium).build()
+                font: Tokens.font.label.medium
             }
 
             RowLayout {
@@ -151,14 +156,12 @@ Item {
                 }
             }
 
-            StyledRect {
+            Item {
                 id: browseRow
 
                 Layout.fillWidth: true
-                Layout.topMargin: Tokens.spacing.medium
+                Layout.topMargin: Tokens.spacing.small
                 Layout.preferredHeight: rowContent.implicitHeight
-                radius: Tokens.rounding.medium
-                color: "transparent"
 
                 SettingsRow {
                     id: rowContent
@@ -177,7 +180,7 @@ Item {
 
                 StateLayer {
                     anchors.fill: parent
-                    radius: parent.radius
+                    radius: Tokens.rounding.extraLarge
                 }
 
                 MouseArea {

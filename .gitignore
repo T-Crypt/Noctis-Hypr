@@ -4,6 +4,7 @@ docs/superpowers/
 .superpowers/
 .claude/
 CLAUDE.md
+ROADMAP_FEATURES.md
 
 noctis.toml
 install.log

@@ -14,60 +14,79 @@ ColumnLayout {
         { value: 5000, label: qsTr("5s") }
     ]
 
-    spacing: Tokens.spacing.medium
+    spacing: Tokens.spacing.largeIncreased
 
     StyledText {
-        text: qsTr("On-screen display")
-        color: Colours.palette.m3onSurfaceVariant
-        font: Tokens.font.label.builders.medium.weight(Font.Medium).build()
+        text: qsTr("OSD / Notifications")
+        font: Tokens.font.title.large
     }
 
-    SettingsToggleRow {
+    ColumnLayout {
         Layout.fillWidth: true
-        icon: "picture_in_picture"
-        label: qsTr("Show OSD")
-        checked: Settings.osdEnabled
-        onToggled: state => Settings.osdEnabled = state
+        spacing: Tokens.spacing.extraSmall
+
+        StyledText {
+            Layout.leftMargin: Tokens.padding.small
+            text: qsTr("On-screen display")
+            color: Colours.palette.m3onSurfaceVariant
+            font: Tokens.font.label.medium
+        }
+
+        SettingsGroup {
+            Layout.fillWidth: true
+
+            SettingsToggleRow {
+                icon: "picture_in_picture"
+                label: qsTr("Show OSD")
+                checked: Settings.osdEnabled
+                onToggled: state => Settings.osdEnabled = state
+            }
+
+            SettingsToggleRow {
+                icon: "brightness_6"
+                label: qsTr("Brightness slider")
+                checked: Settings.osdEnableBrightness
+                onToggled: state => Settings.osdEnableBrightness = state
+            }
+
+            SettingsToggleRow {
+                icon: "mic"
+                label: qsTr("Microphone slider")
+                checked: Settings.osdEnableMicrophone
+                onToggled: state => Settings.osdEnableMicrophone = state
+            }
+
+            SettingsPresetRow {
+                icon: "timer"
+                label: qsTr("OSD hide delay")
+                presets: root.timeoutPresets
+                value: Settings.osdHideDelay
+                onSelected: value => Settings.osdHideDelay = value
+            }
+        }
     }
 
-    SettingsToggleRow {
+    ColumnLayout {
         Layout.fillWidth: true
-        icon: "brightness_6"
-        label: qsTr("Brightness slider")
-        checked: Settings.osdEnableBrightness
-        onToggled: state => Settings.osdEnableBrightness = state
-    }
+        spacing: Tokens.spacing.extraSmall
 
-    SettingsToggleRow {
-        Layout.fillWidth: true
-        icon: "mic"
-        label: qsTr("Microphone slider")
-        checked: Settings.osdEnableMicrophone
-        onToggled: state => Settings.osdEnableMicrophone = state
-    }
+        StyledText {
+            Layout.leftMargin: Tokens.padding.small
+            text: qsTr("Notifications")
+            color: Colours.palette.m3onSurfaceVariant
+            font: Tokens.font.label.medium
+        }
 
-    SettingsPresetRow {
-        Layout.fillWidth: true
-        icon: "timer"
-        label: qsTr("OSD hide delay")
-        presets: root.timeoutPresets
-        value: Settings.osdHideDelay
-        onSelected: value => Settings.osdHideDelay = value
-    }
+        SettingsGroup {
+            Layout.fillWidth: true
 
-    StyledText {
-        Layout.topMargin: Tokens.spacing.medium
-        text: qsTr("Notifications")
-        color: Colours.palette.m3onSurfaceVariant
-        font: Tokens.font.label.builders.medium.weight(Font.Medium).build()
-    }
-
-    SettingsPresetRow {
-        Layout.fillWidth: true
-        icon: "notifications_active"
-        label: qsTr("Notification timeout")
-        presets: root.timeoutPresets
-        value: Settings.notifExpireTimeout
-        onSelected: value => Settings.notifExpireTimeout = value
+            SettingsPresetRow {
+                icon: "notifications_active"
+                label: qsTr("Notification timeout")
+                presets: root.timeoutPresets
+                value: Settings.notifExpireTimeout
+                onSelected: value => Settings.notifExpireTimeout = value
+            }
+        }
     }
 }

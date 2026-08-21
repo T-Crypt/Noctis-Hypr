@@ -10,7 +10,7 @@ ColumnLayout {
 
     property string doctorOutput: qsTr("Running noctis doctor…")
 
-    spacing: Tokens.spacing.medium
+    spacing: Tokens.spacing.largeIncreased
 
     RowLayout {
         Layout.fillWidth: true
@@ -19,8 +19,7 @@ ColumnLayout {
         StyledText {
             Layout.fillWidth: true
             text: qsTr("System")
-            color: Colours.palette.m3onSurfaceVariant
-            font: Tokens.font.label.builders.medium.weight(Font.Medium).build()
+            font: Tokens.font.title.large
         }
 
         StyledRect {

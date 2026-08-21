@@ -44,7 +44,7 @@ ColumnLayout {
         Layout.topMargin: Tokens.spacing.medium
         text: qsTr("Wallpaper art credits")
         color: Colours.palette.m3onSurfaceVariant
-        font: Tokens.font.label.builders.medium.weight(Font.Medium).build()
+        font: Tokens.font.label.medium
     }
 
     StyledText {
