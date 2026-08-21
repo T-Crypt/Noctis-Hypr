@@ -159,7 +159,7 @@ ColumnLayout {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 32
                             radius: Tokens.rounding.small
-                            color: Colours.tPalette.m3surfaceContainerHigh
+                            color: Colours.palette.m3surfaceContainerHigh
 
                             TextInput {
                                 id: hostInput
