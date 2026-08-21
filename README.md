@@ -18,6 +18,7 @@
   <a href="#profiles--layers"><code>Profiles</code></a> ·
   <a href="#architecture"><code>Architecture</code></a> ·
   <a href="#quickshell-shell"><code>Quickshell</code></a> ·
+  <a href="#settings--control-center"><code>Settings</code></a> ·
   <a href="#theming"><code>Theming</code></a> ·
   <a href="#in-motion"><code>Screenshots</code></a> ·
   <a href="#keybindings"><code>Keybindings</code></a> ·
@@ -54,17 +55,22 @@ Waybar, Mako, Swaylock, and Rofi have all been fully retired in favor of one han
 
 | Module | Replaces | Notes |
 |---|---|---|
-| Bar | Waybar | Left-side vertical bar — workspaces, active window, tray, clock, status icons, power button, all with real hover popouts (see below) |
-| Bar popouts | — (new) | Hover any status icon, the tray, or the active window pill for a real detail panel — volume slider + output picker, Wi-Fi list, Bluetooth devices, battery + power profile, full window title, keyboard layout, lock state |
+| Bar | Waybar | Dockable left or right, standard or compact density (Settings → Bar) — workspaces, active window, tray, clock, status icons, power button, all with real hover popouts (see below) |
+| Bar popouts | — (new) | Hover any status icon, the tray, or the active window pill for a real detail panel — volume slider + output picker, Wi-Fi list, Bluetooth devices, battery + power profile, full window title, keyboard layout, lock state, live CPU/GPU/memory/disk/network meter |
 | Launcher | Rofi (drun, clipboard, emoji, wallpaper) | One search box, mode switched by a prefix — see the table below |
 | Screenshot picker | `grim`/`slurp` combo scripts | Drag-select a region with live client-window snapping and a freeze-mode preview, `SUPER+S` still works standalone too |
 | Notifications | Mako | Popup toasts, top-right |
-| OSD | — (new) | Volume/mic/brightness popups on change |
+| OSD | — (new) | Volume/mic/brightness popups on change, enable flags and hide-delay configurable in Settings |
 | Lock screen | Swaylock | Real `ext-session-lock-v1` + real PAM auth via the system's own `/etc/pam.d/swaylock` service — `SUPER+L` |
 | Session/power menu | Rofi's powermenu | Lock, suspend, log out, hibernate, reboot, shut down — `SUPER+Backspace` |
-| Dashboard | — (new) | Clock, calendar, now-playing media — `qs -c noctis ipc call dashboard toggle` |
+| Command Center | — (new) | Tabbed dashboard overlay — Dashboard (clock/calendar/media), Performance (live CPU/GPU/memory/storage/network cards), Workspaces (numbered grid, click to jump), AI Chat (Claude/Ollama/Gemini/ChatGPT, see below) — `qs -c noctis ipc call dashboard toggle` |
+| Settings | — (new) | Full-screen Control Center — searchable category rail (Appearance, Bar, Clock/Date, OSD/Notifications, System, About), cross-theme wallpaper picker, live doctor output — `qs -c noctis ipc call settings toggle` |
 
-Every module is a thin, deliberately-scoped-down rewrite of its caelestia counterpart, not a faithful port — things needing caelestia's own native plugin (fingerprint/face auth, a calculator, Material-You scheme switching, weather, resource meters) were left out in favor of what Noctis actually needs.
+Every module is a thin, deliberately-scoped-down rewrite of its caelestia counterpart, not a faithful port — things needing caelestia's own native plugin (fingerprint/face auth, a calculator, Material-You scheme switching) were left out in favor of what Noctis actually needs; the resource-meter and dashboard gaps that plugin would otherwise cover are hand-implemented instead (see Performance/System above), not skipped.
+
+### AI Chat
+
+The Command Center's AI Chat tab talks to four providers behind one interface: **Claude** (via the `claude` CLI, needs `ANTHROPIC_API_KEY`), **Ollama** (direct HTTP to a configurable local/LAN host, no key needed), **Gemini** and **ChatGPT** (direct HTTP, need their own API keys). A provider with no key/host configured shows a clear inline message telling you what to set instead of failing silently. Keys live in `~/.config/noctis/ai-keys.json` (`chmod 600`, separate from the general shell config); the active provider and Ollama host/model persist in `~/.config/noctis/ai-config.json`. Neither ships with a real address baked in — set your Ollama host from the model picker in the AI Chat tab, or export `OLLAMA_BASE_URL` in your shell.
 
 ### Launcher modes
 
@@ -81,6 +87,30 @@ Every module is a thin, deliberately-scoped-down rewrite of its caelestia counte
 <p align="center">
   <img src="./assets/quickshell-launcher-apps.png" width="49%">
   <img src="./assets/quickshell-launcher-emoji.png" width="49%">
+</p>
+
+<div align="right"><a href="#-top">🡅 back to top</a></div>
+
+<br>
+
+## Settings — Control Center
+
+`qs -c noctis ipc call settings toggle` opens a full-screen panel — a searchable category rail on the left, the selected category's controls on the right, sliding between them instead of a flat crossfade:
+
+| Category | What's in it |
+|---|---|
+| Appearance | Theme grid, wallpaper-in-active-theme quick picker, and a **Browse all wallpapers** grid spanning every theme (click any thumbnail to switch theme + wallpaper + colorscheme together) |
+| Bar | Dock left/right, compact density (vertical orientation is planned, shown disabled for now) |
+| Clock / Date | 12-hour clock, show date in bar clock, desktop clock |
+| OSD / Notifications | Show/hide OSD, brightness/mic sliders, OSD hide delay, notification timeout |
+| System | Live `noctis doctor` output — dependency and path checks, daemon status |
+| About | Version (read from `VERSION`), repo link, wallpaper art credits |
+
+Every toggle here persists to `~/.local/state/noctis/settings.json` and survives a shell restart. Adding a new setting is a data addition to an existing pane, not new UI — every row shares one component (`SettingsRow`) for the icon-badge/title/description/control layout.
+
+<p align="center">
+  <img src="./assets/quickshell-settings.png" width="49%">
+  <img src="./assets/quickshell-wallpaper-picker.png" width="49%">
 </p>
 
 <div align="right"><a href="#-top">🡅 back to top</a></div>
@@ -200,12 +230,16 @@ Noctis-Hypr/
 │   └── layers/                  gaming.toml, dev.toml, ai.toml, exploit.toml
 ├── themes/                      Swappable theme presets (THEME_SPEC.md documents the contract)
 └── Configs/                     Mirrors ~/.config — the configs that actually land on disk
+    ├── systemd/user/              noctis-shell.service — Restart=on-failure supervision for qs
     ├── quickshell/noctis/        Hand-vendored Quickshell shell (see below)
     │   ├── config/                Tokens/Config/GlobalConfig singletons (hand-written, no native plugin)
     │   ├── services/               Colours (wallust-generated), Audio, Hypr, Players, Notifs, ...
-    │   ├── components/             Shared UI primitives (StyledText, MaterialIcon, StateLayer, ...)
+    │   │   └── ai/                   AiConfig/AiKeys/AiProviders — Command Center's AI Chat backend
+    │   ├── components/             Shared UI primitives (StyledText, MaterialIcon, StateLayer,
+    │   │                            SettingsRow/SettingsToggleRow/SettingsPresetRow, ...)
     │   └── modules/                bar/ (+ real popouts), launcher/ (apps/clip/emoji/windows/wallpaper),
-    │                                areapicker/, notifications/, osd/, lock/, session/, dashboard/
+    │                                areapicker/, notifications/, osd/, lock/, session/,
+    │                                dashboard/ (Command Center), settings/ (Control Center)
     ├── hypr/                     hyprland.lua, keybinds.lua, custom.lua (never overwritten, see below)
     └── .local/
         ├── bin/noctis            noctis CLI entry point, symlinked onto PATH by install.sh
@@ -289,6 +323,12 @@ The system automatically tracks your current theme and wallpaper state, enabling
 </p>
 
 **Launcher** — see [Launcher modes](#quickshell-shell) above for the full picture
+
+**Command Center** — tabbed dashboard overlay (Dashboard/Performance/Workspaces/AI Chat)
+
+<p align="center">
+  <img src="./assets/quickshell-command-center.png" width="98%">
+</p>
 
 <div align="right"><a href="#-top">🡅 back to top</a></div>
 
@@ -378,17 +418,20 @@ noctis play guess
 
 ## Roadmap
 
-Noctis is being built in phases, on top of the manifest-driven installer already shipped:
+Noctis reached **v1.0** on `main` — the Quickshell shell, per-theme wallpapers, the unified theme/wallpaper/scheme state contract, and a CI-tested installer are the shipped baseline, not a work in progress. Active development continues on `test`:
 
-- ~~**Identity** — a live bar-position toggle.~~ Superseded: wallust already replaced Pywal as the color engine, and the bar is now Quickshell's own fixed left-side layout rather than a repositionable Waybar.
-- **Quickshell shell** — ✅ done. Waybar, Mako, Swaylock, and Rofi all retired in favor of one hand-vendored Quickshell shell (bar with real popouts, launcher with app/clipboard/emoji/window/wallpaper modes, screenshot picker, notifications, OSD, lock, session menu, dashboard) — see [Quickshell Shell](#quickshell-shell) above.
+- ~~**Identity** — a live bar-position toggle.~~ Shipped: Settings → Bar docks left/right and toggles compact density live.
+- ~~**Quickshell shell**~~ — ✅ shipped in full: bar with real popouts + a live resource meter, launcher with app/clipboard/emoji/window/wallpaper modes, screenshot picker, notifications, OSD, lock, session menu, Command Center (tabbed dashboard + AI Chat), and a full Settings Control Center — see [Quickshell Shell](#quickshell-shell) and [Settings](#settings--control-center) above.
+- ~~**Theming architecture**~~ — ✅ shipped: directory-per-theme wallpaper sets, tracked per-theme wallpaper state, and a wallpaper picker (Settings → Appearance) covering every theme in one grid.
+- **Shell restart supervision** — ✅ shipped: a `systemd --user` unit (`noctis-shell.service`) auto-restarts the Quickshell daemon on crash instead of requiring a manual `SUPER+B`.
+- **`matugen` as a second color engine** — next up. `theme.toml` already reserves the config slot; wiring it in gives themes a real tonal-spot/vibrant/expressive variant picker alongside wallust.
+- **Settings panel expansion** — the Control Center's architecture (one row component, one pane-per-category) is built to grow: AI provider settings, a System-updates action (distinct from the current read-only doctor output), and a plugin category once a real plugin architecture exists to back it.
+- **Bar orientation** — a true vertical-bar mode, distinct from the already-shipped left/right dock toggle.
 - **Gaming profile** — a real performance-mode toggle, MangoHud bar integration, Proton/Steam polish.
-- **Dev environment** — deeper terminal and editor tooling, AI CLI workflow integration on top of the `ai` layer.
-- **Theming architecture** — next up. Directory-per-theme wallpaper sets, a tracked "last wallpaper per theme" state, and a QML theme picker to go with it.
-- **Settings CLI** — next up alongside theming. The `noctis` command already covers theme/wallpaper/scheme switching, backups, and shell control (`noctis shell <ipc-call>` reaches every Quickshell module's IPC surface directly); still to come: wiring those stubs to the new theming architecture, a real `noctis doctor` drift check, and an optional GTK4 welcome window.
-- **Maintenance tooling** — versioning, migrations, and CI.
+- **Dev environment** — deeper terminal and editor tooling, AI CLI workflow integration on top of the `ai` layer (the Command Center's AI Chat tab now covers the interactive side of this).
+- **Maintenance tooling** — release tagging and migration tooling; versioning and CI are already in place.
 
-Longer-term, once the roadmap phases land, the plan is a full wiki — install walkthroughs, theme authoring docs, and a troubleshooting reference — rather than trying to cram everything into this README forever.
+Longer-term, the plan is a full wiki — install walkthroughs, theme authoring docs, and a troubleshooting reference — rather than trying to cram everything into this README forever.
 
 <div align="right"><a href="#-top">🡅 back to top</a></div>
 
