@@ -21,15 +21,16 @@ StyledRect {
         return i % Config.bar.workspaces.shown;
     }
 
-    property real leading: workspaces.count > 0 ? workspaces.itemAt(currentWsIdx)?.y ?? 0 : 0
-    property real trailing: workspaces.count > 0 ? workspaces.itemAt(currentWsIdx)?.y ?? 0 : 0
+    property real leading: workspaces.count > 0 ? (Settings.barVertical ? workspaces.itemAt(currentWsIdx)?.x ?? 0 : workspaces.itemAt(currentWsIdx)?.y ?? 0) : 0
+    property real trailing: workspaces.count > 0 ? (Settings.barVertical ? workspaces.itemAt(currentWsIdx)?.x ?? 0 : workspaces.itemAt(currentWsIdx)?.y ?? 0) : 0
     property real currentSize: workspaces.count > 0 ? (workspaces.itemAt(currentWsIdx) as Workspace)?.size ?? 0 : 0
     property real offset: Math.min(leading, trailing)
     property real size: {
         const s = Math.abs(leading - trailing) + currentSize;
         if (Config.bar.workspaces.activeTrail && lastWs > currentWsIdx) {
             const ws = workspaces.itemAt(lastWs) as Workspace;
-            return ws ? Math.min(ws.y + ws.size - offset, s) : 0;
+            const wsAlong = ws ? (Settings.barVertical ? ws.x : ws.y) : 0;
+            return ws ? Math.min(wsAlong + ws.size - offset, s) : 0;
         }
         return s;
     }
@@ -43,23 +44,37 @@ StyledRect {
     }
 
     clip: true
-    y: offset + mask.y
-    implicitWidth: Settings.barInnerWidth - Tokens.padding.small
-    implicitHeight: size
+    x: Settings.barVertical ? offset + mask.x : 0
+    y: Settings.barVertical ? 0 : offset + mask.y
+    implicitWidth: Settings.barVertical ? size : (Settings.barInnerWidth - Tokens.padding.small)
+    implicitHeight: Settings.barVertical ? (Settings.barInnerWidth - Tokens.padding.small) : size
     radius: Tokens.rounding.full
     color: Colours.palette.m3primary
 
     Colouriser {
+        id: colouriser
+
         source: root.mask
         sourceColor: Colours.palette.m3onSurface
         colorizationColor: Colours.palette.m3onPrimary
 
-        x: 0
-        y: -parent.offset
+        x: Settings.barVertical ? -parent.offset : 0
+        y: Settings.barVertical ? 0 : -parent.offset
         implicitWidth: root.mask.implicitWidth
         implicitHeight: root.mask.implicitHeight
 
         anchors.horizontalCenter: parent.horizontalCenter
+
+        states: State {
+            name: "vertical"
+            when: Settings.barVertical
+
+            AnchorChanges {
+                target: colouriser
+                anchors.horizontalCenter: undefined
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
     }
 
     Behavior on leading {

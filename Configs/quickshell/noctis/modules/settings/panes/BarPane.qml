@@ -22,10 +22,19 @@ ColumnLayout {
         }
 
         SettingsToggleRow {
+            visible: !Settings.barVertical
             icon: "dock_to_right"
             label: qsTr("Dock bar to right edge")
             checked: Settings.barPositionRight
             onToggled: state => Settings.barPositionRight = state
+        }
+
+        SettingsToggleRow {
+            visible: Settings.barVertical
+            icon: "vertical_align_bottom"
+            label: qsTr("Dock bar to bottom edge")
+            checked: Settings.barPositionBottom
+            onToggled: state => Settings.barPositionBottom = state
         }
 
         SettingsToggleRow {
@@ -35,18 +44,14 @@ ColumnLayout {
             onToggled: state => Settings.barCompact = state
         }
 
-        // Vertical bar orientation isn't built yet (roadmap Feature #5) --
-        // this is a different feature than barPositionRight above (which
-        // only docks a still-horizontal bar to the other edge). Shown
-        // disabled rather than omitted so the eventual feature has an
-        // obvious home instead of needing a new row added later.
+        // Roadmap Feature #5 -- a real second orientation (top/bottom
+        // dock, full width, entries flowing left-to-right) alongside the
+        // left/right-docked, top-to-bottom mode above.
         SettingsToggleRow {
-            enabled: false
-            opacity: 0.4
             icon: "swap_horiz"
-            label: qsTr("Vertical orientation (coming soon)")
-            checked: false
-            onToggled: state => {}
+            label: qsTr("Vertical orientation")
+            checked: Settings.barVertical
+            onToggled: state => Settings.barVertical = state
         }
     }
 }

@@ -38,8 +38,12 @@ Item {
     }
 
     clip: true
-    visible: width > Config.border.thickness
+    // Anchor pairs decide which axis is actually screen-edge-driven (see
+    // BarWindow.qml's own dual implicitWidth/implicitHeight comment) -- the
+    // other axis is this collapsible thickness, whichever one that is.
+    visible: (Settings.barVertical ? height : width) > Config.border.thickness
     implicitWidth: fullscreen ? 0 : Config.border.thickness
+    implicitHeight: fullscreen ? 0 : Config.border.thickness
 
     states: State {
         name: "visible"
@@ -47,6 +51,7 @@ Item {
 
         PropertyChanges {
             root.implicitWidth: root.contentWidth
+            root.implicitHeight: root.contentWidth
         }
     }
 
@@ -57,7 +62,7 @@ Item {
 
             Anim {
                 target: root
-                property: "implicitWidth"
+                properties: "implicitWidth,implicitHeight"
             }
         },
         Transition {
@@ -66,7 +71,7 @@ Item {
 
             Anim {
                 target: root
-                property: "implicitWidth"
+                properties: "implicitWidth,implicitHeight"
                 type: Anim.Emphasized
             }
         }
@@ -91,56 +96,44 @@ Item {
     // Qt-documented way to reassign anchor lines reactively without this
     // failure mode -- it cleanly reverts the previous state's anchors
     // instead of relying on a binding evaluating to `undefined`.
+    // background/content below use plain x/y/width/height bindings rather
+    // than anchors -- both axes are always explicit (never just "let the
+    // implicit size flow through"), which matters most for `content`:
+    // Loader forces its loaded item to match ITS OWN size whenever that
+    // size is unambiguous, but a single anchor line (position only, no
+    // opposing pair) turned out NOT to reliably count as "explicit" for
+    // that purpose, leaving Bar.qml sized down to a couple of px instead
+    // of its real content. Plain width/height bindings have no such
+    // ambiguity.
     StyledRect {
         id: background
 
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        width: root.implicitWidth
+        width: Settings.barVertical ? root.width : root.implicitWidth
+        height: Settings.barVertical ? root.implicitWidth : root.height
+        x: !Settings.barVertical && Settings.barPositionRight ? root.width - width : 0
+        y: Settings.barVertical && Settings.barPositionBottom ? root.height - height : 0
 
         radius: Tokens.rounding.full
         color: Colours.tPalette.m3surfaceContainer
         visible: root.shouldBeVisible
-
-        states: State {
-            name: "right"
-            when: Settings.barPositionRight
-
-            AnchorChanges {
-                target: background
-                anchors.right: undefined
-                anchors.left: root.left
-            }
-        }
     }
 
     Loader {
         id: content
 
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
+        width: Settings.barVertical ? root.width : root.contentWidth
+        height: Settings.barVertical ? root.contentWidth : root.height
+        x: !Settings.barVertical && Settings.barPositionRight ? root.width - width : 0
+        y: Settings.barVertical && Settings.barPositionBottom ? root.height - height : 0
 
         active: root.shouldBeVisible
 
         sourceComponent: Bar {
-            width: root.contentWidth
+            thickness: root.contentWidth
             screen: root.screen
             screenState: root.screenState
             popouts: root.popouts // qmllint disable incompatible-type
             fullscreen: root.fullscreen
-        }
-
-        states: State {
-            name: "right"
-            when: Settings.barPositionRight
-
-            AnchorChanges {
-                target: content
-                anchors.right: undefined
-                anchors.left: root.left
-            }
         }
     }
 
@@ -156,8 +149,12 @@ Item {
 
         target: content
         onPointChanged: {
-            if (point.position.y >= 0 && point.position.y <= content.height)
+            if (Settings.barVertical) {
+                if (point.position.x >= 0 && point.position.x <= content.width)
+                    root.checkPopout(point.position.x);
+            } else if (point.position.y >= 0 && point.position.y <= content.height) {
                 root.checkPopout(point.position.y);
+            }
         }
         onHoveredChanged: {
             root.isHovered = hovered;
@@ -168,6 +165,6 @@ Item {
 
     WheelHandler {
         target: content
-        onWheel: event => root.handleWheel(point.position.y, Qt.point(event.angleDelta.x, event.angleDelta.y))
+        onWheel: event => root.handleWheel(Settings.barVertical ? point.position.x : point.position.y, Qt.point(event.angleDelta.x, event.angleDelta.y))
     }
 }

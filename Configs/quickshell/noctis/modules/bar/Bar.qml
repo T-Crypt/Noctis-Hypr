@@ -10,28 +10,70 @@ import qs.config
 import qs.components
 import qs.services
 
-ColumnLayout {
+Item {
     id: root
 
     required property ShellScreen screen
     required property ScreenState screenState
     required property BarPopouts.Wrapper popouts
     required property bool fullscreen
+    required property real thickness
     readonly property int vPadding: Tokens.padding.large
+    // Read by ActiveWindow.qml to work out how much room its own entry has
+    // left along the bar.
+    readonly property real spacing: Tokens.spacing.extraSmall
+
+    // The active layout's Repeater, whichever orientation is live -- both
+    // closeTray() and the along-axis helpers below hit-test/iterate through
+    // this rather than root's own direct children, since the entries now
+    // live one level deeper (root -> Loader -> Row/ColumnLayout -> entry).
+    readonly property Item activeLayout: Settings.barVertical ? hLoader.item : vLoader.item
+    readonly property Repeater activeRepeater: activeLayout?.repeater ?? null
+
+    implicitWidth: Settings.barVertical ? (activeLayout?.implicitWidth ?? 0) : thickness
+    implicitHeight: Settings.barVertical ? thickness : (activeLayout?.implicitHeight ?? 0)
+    width: implicitWidth
+    height: implicitHeight
 
     function closeTray(): void {
         if (!Config.bar.tray.compact)
             return;
 
-        for (let i = 0; i < repeater.count; i++) {
-            const tray = (repeater.itemAt(i) as EntryWrapper).item as Tray;
+        const rep = activeRepeater;
+        if (!rep)
+            return;
+        for (let i = 0; i < rep.count; i++) {
+            const tray = (rep.itemAt(i) as EntryWrapper).item as Tray;
             if (tray)
                 tray.expanded = false;
         }
     }
 
-    function checkPopout(y: real): void {
-        const ch = childAt(width / 2, y) as EntryWrapper;
+    // "Along axis" is whichever screen dimension the bar's length runs on
+    // (y when docked left/right, x when docked top/bottom) -- these three
+    // helpers keep checkPopout/handleWheel written in terms of it instead
+    // of hardcoding y, so both orientations share the same logic below.
+    // All hit-testing/mapping happens against activeLayout rather than
+    // root -- root's own (0,0) is the same point as activeLayout's (0,0)
+    // (the hosting Loader fills root exactly), so positions received in
+    // root's coordinate space (from BarWrapper's HoverHandler/WheelHandler,
+    // which target this component) translate directly with no offset.
+    function alongPoint(pos: real): point {
+        return Settings.barVertical ? Qt.point(pos, height / 2) : Qt.point(width / 2, pos);
+    }
+
+    function childAlong(pos: real): EntryWrapper {
+        const p = alongPoint(pos);
+        return activeLayout?.childAt(p.x, p.y) as EntryWrapper;
+    }
+
+    function centerAlong(item: Item): real {
+        const c = Settings.barVertical ? item.mapToItem(activeLayout, item.implicitWidth / 2, 0) : item.mapToItem(activeLayout, 0, item.implicitHeight / 2);
+        return Settings.barVertical ? c.x : c.y;
+    }
+
+    function checkPopout(pos: real): void {
+        const ch = childAlong(pos);
 
         if (ch?.entryId !== "tray")
             closeTray();
@@ -42,25 +84,29 @@ ColumnLayout {
         }
 
         const id = ch.entryId;
-        const top = ch.y;
+        const top = Settings.barVertical ? ch.x : ch.y;
 
         if (id === "statusIcons" && Config.bar.popouts.statusIcons) {
             const items = (ch.item as StatusIcons).items;
-            const icon = items.childAt(items.width / 2, mapToItem(items, 0, y).y);
+            const localAlong = Settings.barVertical ? activeLayout.mapToItem(items, pos, 0).x : activeLayout.mapToItem(items, 0, pos).y;
+            const icon = Settings.barVertical ? items.childAt(localAlong, items.height / 2) : items.childAt(items.width / 2, localAlong);
             if (icon) {
                 popouts.currentName = icon.name;
-                popouts.currentCenter = Qt.binding(() => icon.mapToItem(root, 0, icon.implicitHeight / 2).y);
+                popouts.currentCenter = Qt.binding(() => root.centerAlong(icon));
                 popouts.hasCurrent = true;
             }
         } else if (id === "tray" && Config.bar.popouts.tray) {
             const tray = ch.item as Tray;
-            if (!Config.bar.tray.compact || (tray.expanded && !tray.expandIcon.contains(mapToItem(tray.expandIcon, tray.implicitWidth / 2, y)))) {
-                const index = Math.floor(((y - top - tray.padding * 2 + tray.spacing) / tray.layout.implicitHeight) * tray.items.count);
+            const hoverPoint = alongPoint(pos);
+            const hoveringExpandIcon = tray.expandIcon.contains(activeLayout.mapToItem(tray.expandIcon, hoverPoint.x, hoverPoint.y));
+            if (!Config.bar.tray.compact || (tray.expanded && !hoveringExpandIcon)) {
+                const trayExtent = Settings.barVertical ? tray.layout.implicitWidth : tray.layout.implicitHeight;
+                const index = Math.floor(((pos - top - tray.padding * 2 + tray.spacing) / trayExtent) * tray.items.count);
                 const trayItem = tray.items.itemAt(index);
                 if (trayItem) {
                     popouts.currentName = `traymenu${index}`;
                     popouts.currentTrayItem = trayItem;
-                    popouts.currentCenter = Qt.binding(() => trayItem.mapToItem(root, 0, trayItem.implicitHeight / 2).y);
+                    popouts.currentCenter = Qt.binding(() => root.centerAlong(trayItem));
                     popouts.hasCurrent = true;
                 } else {
                     popouts.hasCurrent = false;
@@ -71,21 +117,21 @@ ColumnLayout {
             }
         } else if (id === "activeWindow" && Config.bar.popouts.activeWindow && Config.bar.activeWindow.showOnHover) {
             popouts.currentName = id.toLowerCase();
-            popouts.currentCenter = (ch.item as Item).mapToItem(root, 0, (ch.item as Item).implicitHeight / 2).y ?? 0;
+            popouts.currentCenter = root.centerAlong(ch.item as Item) ?? 0;
             popouts.hasCurrent = true;
         } else if (id === "media" && Config.bar.popouts.media) {
             popouts.currentName = id.toLowerCase();
-            popouts.currentCenter = (ch.item as Item).mapToItem(root, 0, (ch.item as Item).implicitHeight / 2).y ?? 0;
+            popouts.currentCenter = root.centerAlong(ch.item as Item) ?? 0;
             popouts.hasCurrent = true;
         } else if (id === "settings" && Config.bar.popouts.settings) {
             popouts.currentName = id.toLowerCase();
-            popouts.currentCenter = (ch.item as Item).mapToItem(root, 0, (ch.item as Item).implicitHeight / 2).y ?? 0;
+            popouts.currentCenter = root.centerAlong(ch.item as Item) ?? 0;
             popouts.hasCurrent = true;
         }
     }
 
-    function handleWheel(y: real, angleDelta: point): void {
-        const ch = childAt(width / 2, y) as EntryWrapper;
+    function handleWheel(pos: real, angleDelta: point): void {
+        const ch = childAlong(pos);
         if (ch?.entryId === "workspaces" && Config.bar.scrollActions.workspaces) {
             // Workspace scroll
             const mon = (GlobalConfig.bar.workspaces.perMonitorWorkspaces ? Hypr.monitorFor(screen) : Hypr.focusedMonitor);
@@ -94,14 +140,14 @@ ColumnLayout {
                 Hypr.dispatch(Hypr.usingLua ? `hl.dsp.workspace.toggle_special("${specialWs.slice(8)}")` : `togglespecialworkspace ${specialWs.slice(8)}`);
             else if (angleDelta.y < 0 || (GlobalConfig.bar.workspaces.perMonitorWorkspaces ? mon.activeWorkspace?.id : Hypr.activeWsId) > 1)
                 Hypr.dispatch(Hypr.usingLua ? `hl.dsp.focus({ workspace = "r${angleDelta.y > 0 ? "-" : "+"}1" })` : `workspace r${angleDelta.y > 0 ? "-" : "+"}1`);
-        } else if (y < screen.height / 2 && Config.bar.scrollActions.volume) {
-            // Volume scroll on top half
+        } else if (pos < (Settings.barVertical ? screen.width : screen.height) / 2 && Config.bar.scrollActions.volume) {
+            // Volume scroll on the half of the bar nearer the screen origin
             if (angleDelta.y > 0)
                 Audio.incrementVolume();
             else if (angleDelta.y < 0)
                 Audio.decrementVolume();
         } else if (Config.bar.scrollActions.brightness) {
-            // Brightness scroll on bottom half
+            // Brightness scroll on the other half
             const monitor = Brightness.getMonitorForScreen(screen);
             if (angleDelta.y > 0)
                 monitor.setBrightness(monitor.brightness + GlobalConfig.services.brightnessIncrement);
@@ -110,9 +156,56 @@ ColumnLayout {
         }
     }
 
-    spacing: Tokens.spacing.extraSmall
+    // Two separate, mutually-exclusive Loaders (ColumnLayout for the
+    // existing left/right dock, RowLayout for the new top/bottom dock)
+    // rather than one flow-toggling GridLayout -- GridLayout fought any
+    // attempt to externally force its own cross-axis size (collapsed real
+    // content down to a couple of px regardless of whether the override
+    // came from a plain binding or a Binding{} element), where the
+    // specialized Row/ColumnLayout types just accept it, as the original
+    // single-orientation code already relied on. Both share the exact
+    // entry list via the EntryList component below.
+    Loader {
+        id: vLoader
 
-    Repeater {
+        anchors.fill: parent
+        active: !Settings.barVertical
+
+        sourceComponent: ColumnLayout {
+            id: vColumn
+
+            property alias repeater: entryList
+
+            width: root.thickness
+            spacing: root.spacing
+
+            EntryList {
+                id: entryList
+            }
+        }
+    }
+
+    Loader {
+        id: hLoader
+
+        anchors.fill: parent
+        active: Settings.barVertical
+
+        sourceComponent: RowLayout {
+            id: hRow
+
+            property alias repeater: entryList
+
+            height: root.thickness
+            spacing: root.spacing
+
+            EntryList {
+                id: entryList
+            }
+        }
+    }
+
+    component EntryList: Repeater {
         id: repeater
 
         model: ScriptModel {
@@ -125,7 +218,8 @@ ColumnLayout {
             DelegateChoice {
                 roleValue: "spacer"
                 delegate: EntryWrapper {
-                    Layout.fillHeight: true
+                    Layout.fillWidth: Settings.barVertical
+                    Layout.fillHeight: !Settings.barVertical
                 }
             }
             DelegateChoice {
@@ -215,9 +309,11 @@ ColumnLayout {
         default property Item item
         readonly property string entryId: modelData.id
 
-        Layout.topMargin: index === 0 ? root.vPadding : 0
-        Layout.bottomMargin: index === repeater.count - 1 ? root.vPadding : 0
-        Layout.alignment: Qt.AlignHCenter
+        Layout.topMargin: !Settings.barVertical && index === 0 ? root.vPadding : 0
+        Layout.bottomMargin: !Settings.barVertical && index === root.activeRepeater.count - 1 ? root.vPadding : 0
+        Layout.leftMargin: Settings.barVertical && index === 0 ? root.vPadding : 0
+        Layout.rightMargin: Settings.barVertical && index === root.activeRepeater.count - 1 ? root.vPadding : 0
+        Layout.alignment: Settings.barVertical ? Qt.AlignVCenter : Qt.AlignHCenter
 
         implicitWidth: item?.implicitWidth ?? 0
         implicitHeight: item?.implicitHeight ?? 0

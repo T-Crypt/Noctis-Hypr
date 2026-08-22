@@ -25,13 +25,30 @@ PanelWindow {
     WlrLayershell.exclusiveZone: barWidth
     color: "transparent"
 
-    anchors.top: true
-    anchors.bottom: true
-    anchors.left: !Settings.barPositionRight
-    anchors.right: Settings.barPositionRight
+    // This window is deliberately wider than the visible bar strip (see
+    // implicitWidth below) to give popout flyouts room to render. Without a
+    // mask, a PanelWindow accepts pointer input across its ENTIRE surface
+    // regardless of what's actually drawn there -- so the ~400px of
+    // transparent flyout space would silently swallow clicks meant for
+    // whatever desktop window sits underneath it, on whichever edge the bar
+    // is currently docked to. Masking to just the real bar strip plus the
+    // flyout's own (collapses to 0x0 when no popout is open) rect keeps
+    // input passthrough everywhere else.
+    mask: Region {
+        item: barWrapper
 
-    // Wider than barWidth to give the popout flyout (drawn on the side of
-    // the bar strip facing away from the docked screen edge, see
+        Region {
+            item: popouts.flyoutItem
+        }
+    }
+
+    anchors.top: Settings.barVertical ? !Settings.barPositionBottom : true
+    anchors.bottom: Settings.barVertical ? Settings.barPositionBottom : true
+    anchors.left: Settings.barVertical ? true : !Settings.barPositionRight
+    anchors.right: Settings.barVertical ? true : Settings.barPositionRight
+
+    // Wider/taller than barWidth to give the popout flyout (drawn on the
+    // side of the bar strip facing away from the docked screen edge, see
     // popouts/Wrapper.qml) real surface to paint into -- Wayland
     // layer-shell surfaces clip anything outside their own bounds, a hard
     // boundary no amount of internal QML sizing can exceed. 400 (was 320,
@@ -40,41 +57,46 @@ PanelWindow {
     // edge regardless of the popout's own implicitWidth) leaves real
     // headroom for both that and the drop shadow's blur bleed around the
     // flyout's edge. exclusionZone above stays pinned to barWidth so this
-    // extra space doesn't reserve desktop area. Anchoring right instead
-    // of left just flips which screen edge implicitWidth grows away from
-    // -- the strip itself stays flush against whichever edge is docked
-    // (see BarWrapper.qml's anchor mirroring below).
+    // extra space doesn't reserve desktop area. Both implicit dimensions
+    // are set unconditionally to the same expression -- whichever axis
+    // has both opposing anchors active (the long axis, spanning the full
+    // screen edge) is anchor-driven and silently ignores this value, so
+    // only the other (short/thickness) axis actually honours it, in
+    // either docking orientation.
     implicitWidth: barWidth + Tokens.spacing.small * 2 + 400
+    implicitHeight: barWidth + Tokens.spacing.small * 2 + 400
 
     BarPopouts.Wrapper {
         id: popouts
         screen: root.screen
         barWidth: root.barWidth
         windowWidth: root.width
+        windowHeight: root.height
     }
 
     BarWrapper {
         id: barWrapper
 
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
         screen: root.screen
         screenState: root.screenState
         popouts: root.popouts
         fullscreen: false
 
-        // See BarWrapper.qml's own background/content anchors for why this
-        // is States + AnchorChanges rather than a ternary-to-undefined.
-        states: State {
-            name: "right"
-            when: Settings.barPositionRight
-
-            AnchorChanges {
-                target: barWrapper
-                anchors.left: undefined
-                anchors.right: root.right
-            }
-        }
+        // Plain x/y/width/height, not anchors -- BarWrapper.qml's own root
+        // already carries a `states: State { name: "visible"; ... }` for
+        // its collapse/expand animation. Assigning a SECOND `states:`
+        // array here (as this used to do, for docking) replaced that
+        // internal one outright instead of merging with it -- QML list
+        // properties set at an instantiation site override the
+        // component's own default, they don't combine -- silently
+        // breaking the auto-hide sizing and leaving barWrapper with no
+        // anchors applied at all. Plain bindings avoid a second `states:`
+        // entirely; self-referencing implicitWidth/implicitHeight as the
+        // "not this axis" fallback is safe here since BarWrapper is a
+        // plain Item, not a Layout fighting an external size.
+        x: !Settings.barVertical && Settings.barPositionRight ? root.width - width : 0
+        y: Settings.barVertical && Settings.barPositionBottom ? root.height - height : 0
+        width: Settings.barVertical ? root.width : implicitWidth
+        height: Settings.barVertical ? implicitHeight : root.height
     }
 }

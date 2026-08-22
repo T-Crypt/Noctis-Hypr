@@ -64,9 +64,14 @@ Item {
 
             anchors.horizontalCenter: root.horizontalCenter
 
+            // Whichever anchor line above/below is actually active (see
+            // states below) owns the cross axis and silently overrides
+            // the corresponding x/y binding here -- so it's safe to just
+            // always feed both from start's own position.
+            x: (start?.x ?? 0) - 1
             y: (start?.y ?? 0) - 1
-            implicitWidth: Settings.barInnerWidth - Tokens.padding.small + 2
-            implicitHeight: start && end ? end.y + end.size - start.y + 2 : 0
+            implicitWidth: Settings.barVertical ? (start && end ? end.x + end.size - start.x + 2 : 0) : (Settings.barInnerWidth - Tokens.padding.small + 2)
+            implicitHeight: Settings.barVertical ? (Settings.barInnerWidth - Tokens.padding.small + 2) : (start && end ? end.y + end.size - start.y + 2 : 0)
 
             color: Colours.layer(Colours.palette.m3surfaceContainerHigh, 2)
             radius: Tokens.rounding.full
@@ -74,13 +79,32 @@ Item {
             scale: 0
             Component.onCompleted: scale = 1
 
+            states: State {
+                name: "vertical"
+                when: Settings.barVertical
+
+                AnchorChanges {
+                    target: rect
+                    anchors.horizontalCenter: undefined
+                    anchors.verticalCenter: root.verticalCenter
+                }
+            }
+
             Behavior on scale {
                 Anim {
                     easing: Tokens.anim.standardDecel
                 }
             }
 
+            Behavior on x {
+                Anim {}
+            }
+
             Behavior on y {
+                Anim {}
+            }
+
+            Behavior on implicitWidth {
                 Anim {}
             }
 

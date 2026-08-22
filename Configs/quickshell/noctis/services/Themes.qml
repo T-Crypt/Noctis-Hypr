@@ -29,6 +29,7 @@ Singleton {
 
     property bool _scanned: false
     property bool _stateLoaded: false
+    property bool _writePending: false
 
     function themeInfo(themeName: string): var {
         return themes.find(t => t.name === themeName) ?? null;
@@ -118,6 +119,7 @@ Singleton {
     }
 
     function _saveState(): void {
+        root._writePending = true;
         stateWriter.setText(JSON.stringify({
             theme: root.activeTheme,
             wallpaper: root.activeWallpaper
@@ -151,6 +153,10 @@ Singleton {
         path: root.statePath
         watchChanges: true
         onLoaded: {
+            if (root._writePending) {
+                root._writePending = false;
+                return;
+            }
             try {
                 const data = JSON.parse(text());
                 root.activeTheme = data.theme ?? "";

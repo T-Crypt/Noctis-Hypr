@@ -22,6 +22,8 @@ Singleton {
     property bool desktopClockEnabled: Config.background.desktopClock.enabled
     property bool barPositionRight: false
     property bool barCompact: false
+    property bool barVertical: false
+    property bool barPositionBottom: false
 
     property bool osdEnabled: Config.osd.enabled
     property int osdHideDelay: Config.osd.hideDelay
@@ -33,10 +35,12 @@ Singleton {
     readonly property real barInnerWidth: Tokens.sizes.bar.innerWidth * (barCompact ? 0.85 : 1)
 
     property bool _loaded: false
+    property bool _writePending: false
 
     function _saveState(): void {
         if (!root._loaded)
             return;
+        root._writePending = true;
         stateWriter.setText(JSON.stringify({
             twelveHourClock: root.twelveHourClock,
             showClockDate: root.showClockDate,
@@ -44,6 +48,8 @@ Singleton {
             desktopClockEnabled: root.desktopClockEnabled,
             barPositionRight: root.barPositionRight,
             barCompact: root.barCompact,
+            barVertical: root.barVertical,
+            barPositionBottom: root.barPositionBottom,
             osdEnabled: root.osdEnabled,
             osdHideDelay: root.osdHideDelay,
             osdEnableBrightness: root.osdEnableBrightness,
@@ -58,6 +64,8 @@ Singleton {
     onDesktopClockEnabledChanged: root._saveState()
     onBarPositionRightChanged: root._saveState()
     onBarCompactChanged: root._saveState()
+    onBarVerticalChanged: root._saveState()
+    onBarPositionBottomChanged: root._saveState()
     onOsdEnabledChanged: root._saveState()
     onOsdHideDelayChanged: root._saveState()
     onOsdEnableBrightnessChanged: root._saveState()
@@ -70,6 +78,10 @@ Singleton {
         path: root.statePath
         watchChanges: true
         onLoaded: {
+            if (root._writePending) {
+                root._writePending = false;
+                return;
+            }
             try {
                 const data = JSON.parse(text());
                 if (typeof data.twelveHourClock === "boolean")
@@ -84,6 +96,10 @@ Singleton {
                     root.barPositionRight = data.barPositionRight;
                 if (typeof data.barCompact === "boolean")
                     root.barCompact = data.barCompact;
+                if (typeof data.barVertical === "boolean")
+                    root.barVertical = data.barVertical;
+                if (typeof data.barPositionBottom === "boolean")
+                    root.barPositionBottom = data.barPositionBottom;
                 if (typeof data.osdEnabled === "boolean")
                     root.osdEnabled = data.osdEnabled;
                 if (typeof data.osdHideDelay === "number")

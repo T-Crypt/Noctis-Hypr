@@ -10,6 +10,8 @@ Item {
     required property var screen
     required property int barWidth
     required property real windowWidth
+    required property real windowHeight
+    readonly property alias flyoutItem: flyout
     property bool hasCurrent: false
     property string currentName: ""
     property real currentCenter: 0
@@ -47,25 +49,28 @@ Item {
 
         visible: opacity > 0
         opacity: root.hasCurrent && loader.item ? 1 : 0
-        // Left-docked: strip sits at local x in [0, barWidth] (root shares
-        // BarWindow's origin, which is the screen edge in that mode), so
-        // the flyout starts just past it. Right-docked: the screen edge is
-        // at local x = windowWidth instead, so the strip sits in
+        // Left/right-docked (vertical bar, see Settings.barVertical):
+        // strip sits at local x in [0, barWidth] (root shares BarWindow's
+        // origin, which is the screen edge in that mode) when docked left,
+        // so the flyout starts just past it. Right-docked: the screen edge
+        // is at local x = windowWidth instead, so the strip sits in
         // [windowWidth - barWidth, windowWidth] and the flyout must render
         // on the other side of it, ending at windowWidth - barWidth -
-        // spacing and growing further left. x is a plain expression of
-        // width here (not scale/transformOrigin), so the Behavior on
-        // width below drags x along with it every frame, keeping the
-        // flyout's edge nearest the bar pinned in both docking modes as
-        // it grows/shrinks, rather than growing away from a fixed corner.
-        x: Settings.barPositionRight ? root.windowWidth - root.barWidth - Tokens.spacing.small - width : root.barWidth + Tokens.spacing.small
-        // Clamp both edges -- Math.max alone kept the flyout from starting
-        // above the screen top but let it run off the bottom uncorrected
-        // for any popout tall enough that its vertical center sits in the
-        // lower half of the bar (Settings, Resources), since this
-        // window's own height matches the screen's and content can't
-        // render past that boundary.
-        y: Math.min(Math.max(0, root.currentCenter - height / 2), root.screen.height - height)
+        // spacing and growing further left. Top/bottom-docked mirrors the
+        // same reasoning onto y/windowHeight instead. x/y are plain
+        // expressions of width/height here (not scale/transformOrigin),
+        // so the Behaviors on width/height below drag x/y along with them
+        // every frame, keeping the flyout's edge nearest the bar pinned in
+        // every docking mode as it grows/shrinks, rather than growing away
+        // from a fixed corner.
+        x: Settings.barVertical ? Math.min(Math.max(0, root.currentCenter - width / 2), root.screen.width - width) : (Settings.barPositionRight ? root.windowWidth - root.barWidth - Tokens.spacing.small - width : root.barWidth + Tokens.spacing.small)
+        // Clamp the along-axis edge -- Math.max alone kept the flyout from
+        // starting before the screen's near edge but let it run off the
+        // far edge uncorrected for any popout whose along-axis center sits
+        // in the latter half of the bar (Settings, Resources), since this
+        // window's own size matches the screen's on that axis and content
+        // can't render past that boundary.
+        y: Settings.barVertical ? (Settings.barPositionBottom ? root.windowHeight - root.barWidth - Tokens.spacing.small - height : root.barWidth + Tokens.spacing.small) : Math.min(Math.max(0, root.currentCenter - height / 2), root.screen.height - height)
         width: loader.item ? loader.item.implicitWidth + Tokens.padding.medium * 2 : 0
         height: loader.item ? loader.item.implicitHeight + Tokens.padding.medium * 2 : 0
         radius: Tokens.rounding.medium

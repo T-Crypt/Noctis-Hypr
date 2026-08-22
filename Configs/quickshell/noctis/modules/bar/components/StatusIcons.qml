@@ -44,18 +44,34 @@ StyledRect {
     radius: Tokens.rounding.full
 
     clip: true
-    implicitWidth: Settings.barInnerWidth
-    implicitHeight: iconColumn.implicitHeight + Tokens.padding.medium * 2
+    implicitWidth: Settings.barVertical ? iconColumn.implicitWidth + Tokens.padding.medium * 2 : Settings.barInnerWidth
+    implicitHeight: Settings.barVertical ? Settings.barInnerWidth : iconColumn.implicitHeight + Tokens.padding.medium * 2
 
-    ColumnLayout {
+    GridLayout {
         id: iconColumn
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: Tokens.padding.medium
+        anchors.bottomMargin: Settings.barVertical ? 0 : Tokens.padding.medium
+        anchors.rightMargin: Settings.barVertical ? Tokens.padding.medium : 0
 
-        spacing: 0
+        flow: Settings.barVertical ? GridLayout.LeftToRight : GridLayout.TopToBottom
+        rowSpacing: 0
+        columnSpacing: 0
+
+        states: State {
+            name: "vertical"
+            when: Settings.barVertical
+
+            AnchorChanges {
+                target: iconColumn
+                anchors.left: undefined
+                anchors.top: root.top
+                anchors.bottom: root.bottom
+                anchors.right: root.right
+            }
+        }
 
         Repeater {
             model: ScriptModel {
@@ -178,9 +194,14 @@ StyledRect {
         default property Item item
         property string name: modelData.id.toLowerCase()
 
-        Layout.topMargin: Math.round(topGap)
-        Layout.bottomMargin: Math.round(bottomGap)
-        Layout.alignment: Qt.AlignHCenter
+        // topGap/bottomGap are really "leading gap"/"trailing gap" along
+        // whichever axis the icons flow on -- routed to left/right margins
+        // instead of top/bottom when the bar runs horizontally.
+        Layout.topMargin: Settings.barVertical ? 0 : Math.round(topGap)
+        Layout.bottomMargin: Settings.barVertical ? 0 : Math.round(bottomGap)
+        Layout.leftMargin: Settings.barVertical ? Math.round(topGap) : 0
+        Layout.rightMargin: Settings.barVertical ? Math.round(bottomGap) : 0
+        Layout.alignment: Settings.barVertical ? Qt.AlignVCenter : Qt.AlignHCenter
 
         implicitWidth: item?.implicitWidth ?? 0
         implicitHeight: item?.implicitHeight ?? 0

@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Bluetooth
 import qs.config
 import qs.components
+import qs.services
 import qs.utils
 
 Item {
@@ -16,16 +17,24 @@ Item {
     implicitWidth: layout.implicitWidth
     implicitHeight: layout.implicitHeight
 
+    Behavior on implicitWidth {
+        Anim {
+            type: Anim.DefaultEffects
+        }
+    }
+
     Behavior on implicitHeight {
         Anim {
             type: Anim.DefaultEffects
         }
     }
 
-    ColumnLayout {
+    GridLayout {
         id: layout
 
-        spacing: Tokens.spacing.medium / 2
+        flow: Settings.barVertical ? GridLayout.LeftToRight : GridLayout.TopToBottom
+        rowSpacing: Tokens.spacing.medium / 2
+        columnSpacing: Tokens.spacing.medium / 2
 
         // Bluetooth icon
         MaterialIcon {

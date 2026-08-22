@@ -46,6 +46,7 @@ ColumnLayout {
     SettingsToggleRow {
         Layout.fillWidth: true
         Layout.preferredWidth: 300
+        visible: !Settings.barVertical
         icon: "dock_to_right"
         label: qsTr("Dock bar to right edge")
         checked: Settings.barPositionRight
@@ -55,9 +56,28 @@ ColumnLayout {
     SettingsToggleRow {
         Layout.fillWidth: true
         Layout.preferredWidth: 300
+        visible: Settings.barVertical
+        icon: "vertical_align_bottom"
+        label: qsTr("Dock bar to bottom edge")
+        checked: Settings.barPositionBottom
+        onToggled: state => Settings.barPositionBottom = state
+    }
+
+    SettingsToggleRow {
+        Layout.fillWidth: true
+        Layout.preferredWidth: 300
         icon: "density_small"
         label: qsTr("Compact bar")
         checked: Settings.barCompact
         onToggled: state => Settings.barCompact = state
+    }
+
+    SettingsToggleRow {
+        Layout.fillWidth: true
+        Layout.preferredWidth: 300
+        icon: "swap_horiz"
+        label: qsTr("Vertical orientation")
+        checked: Settings.barVertical
+        onToggled: state => Settings.barVertical = state
     }
 }
