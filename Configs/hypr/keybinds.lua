@@ -4,39 +4,39 @@ local mainMod = "SUPER"
 
 -- Main binds
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("kitty"))
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("qs -c noctis ipc call lock engage"))
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("qs -c aphotic ipc call lock engage"))
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("wlogout --protocol layer-shell"))
-hl.bind(mainMod .. " + backspace", hl.dsp.exec_cmd("qs -c noctis ipc call session toggle"))
+hl.bind(mainMod .. " + backspace", hl.dsp.exec_cmd("qs -c aphotic ipc call session toggle"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("thunar"))
-hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("qs -c noctis ipc call launcher toggle"))
-hl.bind(mainMod .. " + space", hl.dsp.exec_cmd("qs -c noctis ipc call launcher toggle"))
+hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("qs -c aphotic ipc call launcher toggle"))
+hl.bind(mainMod .. " + space", hl.dsp.exec_cmd("qs -c aphotic ipc call launcher toggle"))
 hl.bind(mainMod .. " + S", hl.dsp.exec_cmd('grim -g "$(slurp)" - | swappy -f -'))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("python3 ~/.config/hypr/scripts/wallswitcher.py"))
-hl.bind(mainMod .. " + CTRL + W", hl.dsp.exec_cmd("qs -c noctis ipc call launcher openWallpapers"))
-hl.bind(mainMod .. " + comma", hl.dsp.exec_cmd("noctis theme prev"))
-hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("noctis theme next"))
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("systemctl --user restart noctis-shell.service"))
+hl.bind(mainMod .. " + CTRL + W", hl.dsp.exec_cmd("qs -c aphotic ipc call launcher openWallpapers"))
+hl.bind(mainMod .. " + comma", hl.dsp.exec_cmd("aphotic theme prev"))
+hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("aphotic theme next"))
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("systemctl --user restart aphotic-shell.service"))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("firefox"))
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("code"))
 
 -- Quickshell surfaces (Command Center, Settings, notifications)
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs -c noctis ipc call dashboard toggle"))
-hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("qs -c noctis ipc call settings toggle"))
-hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("qs -c noctis ipc call notifs clear"))
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs -c aphotic ipc call dashboard toggle"))
+hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("qs -c aphotic ipc call settings toggle"))
+hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("qs -c aphotic ipc call notifs clear"))
 
 -- Quickshell area picker (drag-select with client snapping + freeze preview) —
 -- distinct from the raw grim/slurp/swappy bind on mainMod + S above, which
 -- stays as the simple no-frills fallback.
-hl.bind(mainMod .. " + SHIFT + S",         hl.dsp.exec_cmd("qs -c noctis ipc call picker open"))
-hl.bind(mainMod .. " + CTRL + S",          hl.dsp.exec_cmd("qs -c noctis ipc call picker openFreeze"))
-hl.bind(mainMod .. " + ALT + S",           hl.dsp.exec_cmd("qs -c noctis ipc call picker openClip"))
-hl.bind(mainMod .. " + CTRL + ALT + S",    hl.dsp.exec_cmd("qs -c noctis ipc call picker openFreezeClip"))
+hl.bind(mainMod .. " + SHIFT + S",         hl.dsp.exec_cmd("qs -c aphotic ipc call picker open"))
+hl.bind(mainMod .. " + CTRL + S",          hl.dsp.exec_cmd("qs -c aphotic ipc call picker openFreeze"))
+hl.bind(mainMod .. " + ALT + S",           hl.dsp.exec_cmd("qs -c aphotic ipc call picker openClip"))
+hl.bind(mainMod .. " + CTRL + ALT + S",    hl.dsp.exec_cmd("qs -c aphotic ipc call picker openFreezeClip"))
 
 -- Audio output cycling and special-workspace cycling (Quickshell IPC, no
 -- other UI path exists for either of these yet)
-hl.bind(mainMod .. " + CTRL + O", hl.dsp.exec_cmd("qs -c noctis ipc call audio cycleOutput"))
-hl.bind(mainMod .. " + CTRL + Tab",         hl.dsp.exec_cmd("qs -c noctis ipc call hypr cycleSpecialWorkspace next"))
-hl.bind(mainMod .. " + CTRL + SHIFT + Tab", hl.dsp.exec_cmd("qs -c noctis ipc call hypr cycleSpecialWorkspace prev"))
+hl.bind(mainMod .. " + CTRL + O", hl.dsp.exec_cmd("qs -c aphotic ipc call audio cycleOutput"))
+hl.bind(mainMod .. " + CTRL + Tab",         hl.dsp.exec_cmd("qs -c aphotic ipc call hypr cycleSpecialWorkspace next"))
+hl.bind(mainMod .. " + CTRL + SHIFT + Tab", hl.dsp.exec_cmd("qs -c aphotic ipc call hypr cycleSpecialWorkspace prev"))
 
 -- Window binds
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
@@ -58,10 +58,10 @@ hl.bind("ALT + SHIFT + Tab", hl.dsp.window.cycle_next({ next = false }))
 
 -- Media keys (mpris — Quickshell's own player service, works with any
 -- MPRIS-capable player, not just one hardcoded to a specific app)
-hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("qs -c noctis ipc call mpris playPause"), { locked = true })
-hl.bind("XF86AudioPause", hl.dsp.exec_cmd("qs -c noctis ipc call mpris playPause"), { locked = true })
-hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("qs -c noctis ipc call mpris next"),      { locked = true })
-hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("qs -c noctis ipc call mpris previous"),  { locked = true })
+hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("qs -c aphotic ipc call mpris playPause"), { locked = true })
+hl.bind("XF86AudioPause", hl.dsp.exec_cmd("qs -c aphotic ipc call mpris playPause"), { locked = true })
+hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("qs -c aphotic ipc call mpris next"),      { locked = true })
+hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("qs -c aphotic ipc call mpris previous"),  { locked = true })
 
 -- Laptop binds
 hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("pamixer -t"),                     { locked = true })
