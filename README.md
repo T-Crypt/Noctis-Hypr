@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="assets/noctis-banner.svg" alt="Noctis — Hyprland dotfiles, after dark" width="900">
+  <img src="assets/aphotic-banner.svg" alt="Aphotic — Hyprland dotfiles, after dark" width="900">
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/stars/T-Crypt/Noctis-Hypr?style=for-the-badge&color=7DCFFF&labelColor=0b0d12">
-  <img src="https://img.shields.io/github/issues/T-Crypt/Noctis-Hypr?style=for-the-badge&color=E0AF68&labelColor=0b0d12">
-  <img src="https://img.shields.io/github/forks/T-Crypt/Noctis-Hypr?style=for-the-badge&color=F7768E&labelColor=0b0d12">
-  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/T-Crypt/Noctis-Hypr?style=for-the-badge&color=AD8EE6&labelColor=0b0d12">
+  <img src="https://img.shields.io/github/stars/T-Crypt/Aphotic-Hypr?style=for-the-badge&color=7DCFFF&labelColor=0b0d12">
+  <img src="https://img.shields.io/github/issues/T-Crypt/Aphotic-Hypr?style=for-the-badge&color=E0AF68&labelColor=0b0d12">
+  <img src="https://img.shields.io/github/forks/T-Crypt/Aphotic-Hypr?style=for-the-badge&color=F7768E&labelColor=0b0d12">
+  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/T-Crypt/Aphotic-Hypr?style=for-the-badge&color=AD8EE6&labelColor=0b0d12">
 </p>
 
 <p align="center">
@@ -51,7 +51,7 @@
 
 ## Quickshell Shell
 
-Waybar, Mako, Swaylock, and Rofi have all been fully retired in favor of one hand-vendored [Quickshell](https://quickshell.org) shell — visually inspired from [caelestia-dots/shell](https://github.com/caelestia-dots/shell) (GPL-3.0), not an installed dependency: the QML is checked into `Configs/quickshell/noctis/`, with no native C++ plugin required. Color comes from `wallust` the same as everything else — Quickshell doesn't bring its own theming engine.
+Waybar, Mako, Swaylock, and Rofi have all been fully retired in favor of one hand-vendored [Quickshell](https://quickshell.org) shell — visually inspired from [caelestia-dots/shell](https://github.com/caelestia-dots/shell) (GPL-3.0), not an installed dependency: the QML is checked into `Configs/quickshell/aphotic/`, with no native C++ plugin required. Color comes from `wallust` the same as everything else — Quickshell doesn't bring its own theming engine.
 
 | Module | Replaces | Notes |
 |---|---|---|
@@ -66,11 +66,11 @@ Waybar, Mako, Swaylock, and Rofi have all been fully retired in favor of one han
 | Command Center | — (new) | Tabbed dashboard overlay — Dashboard (clock/calendar/media), Performance (live CPU/GPU/memory/storage/network cards), Workspaces (numbered grid, click to jump), AI Chat (Claude/Ollama/Gemini/ChatGPT, see below) — `SUPER+D` |
 | Settings | — (new) | Full-screen Control Center — searchable category rail (Appearance, Bar, Clock/Date, OSD/Notifications, AI, System, About), cross-theme wallpaper picker, live doctor output — `SUPER+I` |
 
-Every module is a thin, deliberately-scoped-down rewrite of its caelestia counterpart, not a faithful port — things needing caelestia's own native plugin (fingerprint/face auth, a calculator, Material-You scheme switching) were left out in favor of what Noctis actually needs; the resource-meter and dashboard gaps that plugin would otherwise cover are hand-implemented instead (see Performance/System above), not skipped.
+Every module is a thin, deliberately-scoped-down rewrite of its caelestia counterpart, not a faithful port — things needing caelestia's own native plugin (fingerprint/face auth, a calculator, Material-You scheme switching) were left out in favor of what Aphotic actually needs; the resource-meter and dashboard gaps that plugin would otherwise cover are hand-implemented instead (see Performance/System above), not skipped.
 
 ### AI Chat
 
-The Command Center's AI Chat tab talks to four providers behind one interface: **Claude** (via the `claude` CLI, needs `ANTHROPIC_API_KEY`), **Ollama** (direct HTTP to a configurable local/LAN host, no key needed), **Gemini** and **ChatGPT** (direct HTTP, need their own API keys). A provider with no key/host configured shows a clear inline message telling you what to set instead of failing silently. Keys live in `~/.config/noctis/ai-keys.json` (`chmod 600`, separate from the general shell config); the active provider and Ollama host/model persist in `~/.config/noctis/ai-config.json`. Neither ships with a real address baked in — set your Ollama host from the model picker in the AI Chat tab, or export `OLLAMA_BASE_URL` in your shell.
+The Command Center's AI Chat tab talks to four providers behind one interface: **Claude** (via the `claude` CLI, needs `ANTHROPIC_API_KEY`), **Ollama** (direct HTTP to a configurable local/LAN host, no key needed), **Gemini** and **ChatGPT** (direct HTTP, need their own API keys). A provider with no key/host configured shows a clear inline message telling you what to set instead of failing silently. Keys live in `~/.config/aphotic/ai-keys.json` (`chmod 600`, separate from the general shell config); the active provider and Ollama host/model persist in `~/.config/aphotic/ai-config.json`. Neither ships with a real address baked in — set your Ollama host from the model picker in the AI Chat tab, or export `OLLAMA_BASE_URL` in your shell.
 
 ### Launcher modes
 
@@ -80,7 +80,7 @@ The Command Center's AI Chat tab talks to four providers behind one interface: *
 |:--:|---|---|
 | *(nothing)* | Search & launch installed apps | Desktop entries |
 | `>` | Clipboard history | `cliphist` |
-| `:` | Emoji picker | `Configs/quickshell/noctis/data/emoji.txt` |
+| `:` | Emoji picker | `Configs/quickshell/aphotic/data/emoji.txt` |
 | `/` | Switch to an open window | Hyprland's own window list |
 | `~` | Change wallpaper | Files in `~/.config/awww` |
 
@@ -95,7 +95,7 @@ The Command Center's AI Chat tab talks to four providers behind one interface: *
 
 ## Settings — Control Center
 
-`SUPER+I` (or `qs -c noctis ipc call settings toggle`) opens a full-screen panel — a searchable, scrollable category rail on the left, the selected category's controls on the right, sliding between them instead of a flat crossfade:
+`SUPER+I` (or `qs -c aphotic ipc call settings toggle`) opens a full-screen panel — a searchable, scrollable category rail on the left, the selected category's controls on the right, sliding between them instead of a flat crossfade:
 
 | Category | What's in it |
 |---|---|
@@ -104,10 +104,10 @@ The Command Center's AI Chat tab talks to four providers behind one interface: *
 | Clock / Date | 12-hour clock, show date in bar clock, desktop clock |
 | OSD / Notifications | Show/hide OSD, brightness/mic sliders, OSD hide delay, notification timeout |
 | AI | Active provider (Ollama/Claude/Gemini/ChatGPT), live Ollama host + model picker, masked API-key entry for each provider — same backend as the Command Center's AI Chat tab |
-| System | Live `noctis doctor` output — dependency and path checks, daemon status |
-| About | Real Noctis logo, version (read from `VERSION`), repo link, wallpaper art credits |
+| System | Live `aphotic doctor` output — dependency and path checks, daemon status |
+| About | Real Aphotic logo, version (read from `VERSION`), repo link, wallpaper art credits |
 
-Every toggle here persists to `~/.local/state/noctis/settings.json` and survives a shell restart. Adding a new setting is a data addition to an existing pane, not new UI — every row shares one component (`SettingsRow`, grouped into connected-card sections by `SettingsGroup`) for the icon-badge/title/description/control layout. Pane content and the category rail both scroll independently once they outgrow the panel, so a long pane never gets clipped.
+Every toggle here persists to `~/.local/state/aphotic/settings.json` and survives a shell restart. Adding a new setting is a data addition to an existing pane, not new UI — every row shares one component (`SettingsRow`, grouped into connected-card sections by `SettingsGroup`) for the icon-badge/title/description/control layout. Pane content and the category rail both scroll independently once they outgrow the panel, so a long pane never gets clipped.
 
 <p align="center">
   <img src="./assets/quickshell-settings.png" width="49%">
@@ -118,15 +118,15 @@ Every toggle here persists to `~/.local/state/noctis/settings.json` and survives
 
 <br>
 
-## Why Noctis
+## Why Aphotic
 
-Most rices are a snapshot — a config someone tuned once and stopped touching, distributed as a pile of dotfiles you copy over your own and hope for the best. Noctis is built to keep moving. Underneath the visuals is a small, deliberate piece of infrastructure:
+Most rices are a snapshot — a config someone tuned once and stopped touching, distributed as a pile of dotfiles you copy over your own and hope for the best. Aphotic is built to keep moving. Underneath the visuals is a small, deliberate piece of infrastructure:
 
 - **Declarative, not hardcoded.** Package sets live as data (`profiles/*.toml`), not as bash arrays buried in an install script. Changing what ships means editing a TOML file, not surgery on `install.sh`.
 - **Composable, not monolithic.** A base profile (`minimal` or `full`) plus any combination of layers (`gaming`, `dev`, `ai`, `exploit`) resolve into one merged package list at install time. Add a layer without touching the base; add a base without touching the layers.
-- **Safe to run twice.** Every install is snapshotted to a timestamped backup before anything changes, and the resolved choice is written to `noctis.toml` so a re-run can detect and reuse it instead of asking the same questions again.
+- **Safe to run twice.** Every install is snapshotted to a timestamped backup before anything changes, and the resolved choice is written to `aphotic.toml` so a re-run can detect and reuse it instead of asking the same questions again.
 - **Honest about what it will do.** `--dry-run` prints the entire install plan — every package, every layer, every detected system fact — and touches nothing. No surprises, no `sudo` running until you've actually agreed to something.
-- **Reversible.** `./uninstall.sh` restores your most recent backup on request. Trying Noctis was never supposed to mean burning your current setup down first.
+- **Reversible.** `./uninstall.sh` restores your most recent backup on request. Trying Aphotic was never supposed to mean burning your current setup down first.
 
 None of this is unique in isolation, but it's what turns a rice from something you install once into something you can actually keep living in.
 
@@ -137,15 +137,15 @@ None of this is unique in isolation, but it's what turns a rice from something y
 ## Install
 
 > [!IMPORTANT]
-> Noctis assumes an Arch/AUR base. It hasn't been tested on other distros and no distro branching is planned — see the [FAQ](#faq).
+> Aphotic assumes an Arch/AUR base. It hasn't been tested on other distros and no distro branching is planned — see the [FAQ](#faq).
 
 ```
-git clone https://github.com/T-Crypt/Noctis-Hypr && cd Noctis-Hypr
+git clone https://github.com/T-Crypt/Aphotic-Hypr && cd Aphotic-Hypr
 chmod +x install.sh
 ./install.sh
 ```
 
-Running with no flags launches a short wizard — profile, optional layers, theme — and writes your choices to `noctis.toml`, which becomes the source of truth for every re-run after that.
+Running with no flags launches a short wizard — profile, optional layers, theme — and writes your choices to `aphotic.toml`, which becomes the source of truth for every re-run after that.
 
 > [!TIP]
 > Prefer to skip the prompts entirely:
@@ -164,19 +164,19 @@ Running with no flags launches a short wizard — profile, optional layers, them
 | `-h`, `--help` | Full flag reference. |
 
 > [!NOTE]
-> `--dry-run` is checked before anything else runs — no `sudo` prompt, no package installs, no filesystem writes happen ahead of it. Re-running `install.sh` later detects your last saved config in `noctis.toml` and offers to reuse it without repeating the wizard.
+> `--dry-run` is checked before anything else runs — no `sudo` prompt, no package installs, no filesystem writes happen ahead of it. Re-running `install.sh` later detects your last saved config in `aphotic.toml` and offers to reuse it without repeating the wizard.
 
 Custom apps live in `profiles/custom_apps.lst` (still readable at the repo root as a symlink, for anyone on an older clone) and are folded into the resolved package list automatically — no separate prompt needed.
 
 ### Updating
 
 ```
-cd Noctis-Hypr
+cd Aphotic-Hypr
 git pull
 ./install.sh
 ```
 
-Noctis detects your saved `noctis.toml` and re-resolves your profile/layers against any changes upstream, snapshotting your current configs first exactly as a fresh install would.
+Aphotic detects your saved `aphotic.toml` and re-resolves your profile/layers against any changes upstream, snapshotting your current configs first exactly as a fresh install would.
 
 ### Uninstalling
 
@@ -200,7 +200,7 @@ A **profile** is the base package set. A **layer** is an optional add-on merged 
 | Profile | What you get |
 |---|---|
 | `minimal` | Hyprland, Quickshell, Kitty, awww, plus the binaries the always-loaded Quickshell shell itself needs (wallust, grim/slurp/swappy, brightnessctl, swaylock-effects) — the bare tiling desktop, nothing else. |
-| `full` | Everything in `minimal`, plus the complete Noctis experience: theming (Pywal, Pywalfox, Dracula GTK/icons), shell tooling (ZSH, Powerlevel10k, Starship), media (mpv, Cava, Swappy), file management (Thunar plus archive/GVFS plugins), Bluetooth, SDDM, and more. |
+| `full` | Everything in `minimal`, plus the complete Aphotic experience: theming (Pywal, Pywalfox, Dracula GTK/icons), shell tooling (ZSH, Powerlevel10k, Starship), media (mpv, Cava, Swappy), file management (Thunar plus archive/GVFS plugins), Bluetooth, SDDM, and more. |
 
 | Layer | Adds |
 |---|---|
@@ -217,12 +217,12 @@ Layers are additive and dedupe against the base and each other, so `--with gamin
 
 ## Architecture
 
-Noctis's repo mirrors what actually gets installed, plus the machinery that decides what that is:
+Aphotic's repo mirrors what actually gets installed, plus the machinery that decides what that is:
 
 ```
-Noctis-Hypr/
+Aphotic-Hypr/
 ├── install.sh / uninstall.sh   Thin orchestrators — wizard or flags in, resolved plan out
-├── noctis.toml                 Generated on first install: the resolved source of truth
+├── aphotic.toml                 Generated on first install: the resolved source of truth
 ├── lib/
 │   ├── install/                 Wizard prompts, AUR helper detection, backups, config linking
 │   └── toml/                    Profile + layer merge logic
@@ -231,8 +231,8 @@ Noctis-Hypr/
 │   └── layers/                  gaming.toml, dev.toml, ai.toml, exploit.toml
 ├── themes/                      Swappable theme presets (THEME_SPEC.md documents the contract)
 └── Configs/                     Mirrors ~/.config — the configs that actually land on disk
-    ├── systemd/user/              noctis-shell.service — Restart=on-failure supervision for qs
-    ├── quickshell/noctis/        Hand-vendored Quickshell shell (see below)
+    ├── systemd/user/              aphotic-shell.service — Restart=on-failure supervision for qs
+    ├── quickshell/aphotic/        Hand-vendored Quickshell shell (see below)
     │   ├── config/                Tokens/Config/GlobalConfig singletons (hand-written, no native plugin)
     │   ├── services/               Colours (wallust-generated), Audio, Hypr, Players, Notifs, ...
     │   │   └── ai/                   AiConfig/AiKeys/AiProviders — Command Center's AI Chat + Settings → AI backend
@@ -243,13 +243,13 @@ Noctis-Hypr/
     │                                dashboard/ (Command Center), settings/ (Control Center, 7 panes)
     ├── hypr/                     hyprland.lua, keybinds.lua, custom.lua (never overwritten, see below)
     └── .local/
-        ├── bin/noctis            noctis CLI entry point, symlinked onto PATH by install.sh
-        └── lib/noctis/           noctis CLI internals (commands/, globalcontrol.sh)
+        ├── bin/aphotic            aphotic CLI entry point, symlinked onto PATH by install.sh
+        └── lib/aphotic/           aphotic CLI internals (commands/, globalcontrol.sh)
 ```
 
 `install.sh` never hardcodes a package list — it resolves one at runtime by merging `profiles/base/<profile>.toml` with each selected `profiles/layers/<layer>.toml`, deduplicating as it goes. Everything downstream (backups, AUR helper choice, config copying) reads from that single resolved plan.
 
-`~/.config/hypr/custom.lua` is the one file `install.sh` never touches once it exists — put your own Hyprland tweaks there and a re-run or `noctis update` won't clobber them, the same idea as ML4W's protected `custom.conf`.
+`~/.config/hypr/custom.lua` is the one file `install.sh` never touches once it exists — put your own Hyprland tweaks there and a re-run or `aphotic update` won't clobber them, the same idea as ML4W's protected `custom.conf`.
 
 <div align="right"><a href="#-top">🡅 back to top</a></div>
 
@@ -271,8 +271,8 @@ Wallpaper-driven color generation, applied consistently across the stack:
 
 ## Theme Picker Integration
 
-Noctis now features a complete theming system with:
-- CLI commands for theme management (`noctis theme list`, `set`, `next`, `prev`)
+Aphotic now features a complete theming system with:
+- CLI commands for theme management (`aphotic theme list`, `set`, `next`, `prev`)
 - <kbd>Super</kbd> + <kbd>,</kbd> / <kbd>Super</kbd> + <kbd>.</kbd> keybinds to cycle themes without leaving the keyboard
 - Automatic palette regeneration when schemes change
 - State tracking for current theme and wallpaper
@@ -283,21 +283,21 @@ Noctis now features a complete theming system with:
 
 ```bash
 # List available themes
-noctis theme list
+aphotic theme list
 
 # Apply a specific theme
-noctis theme set <theme-name>
+aphotic theme set <theme-name>
 
 # Cycle through themes
-noctis theme next    # Switch to next theme
-noctis theme prev    # Switch to previous theme
+aphotic theme next    # Switch to next theme
+aphotic theme prev    # Switch to previous theme
 
 # Manage color schemes
-noctis scheme set -n <scheme-name>  # Apply a named color scheme
+aphotic scheme set -n <scheme-name>  # Apply a named color scheme
 
 # Wallpaper management
-noctis wallpaper -f <path>     # Set specific wallpaper
-noctis wallpaper --random      # Pick random wallpaper
+aphotic wallpaper -f <path>     # Set specific wallpaper
+aphotic wallpaper --random      # Pick random wallpaper
 ```
 
 The system automatically tracks your current theme and wallpaper state, enabling seamless cycling through themes and real-time palette updates when schemes are changed.
@@ -337,7 +337,7 @@ The system automatically tracks your current theme and wallpaper state, enabling
 
 ## Keybindings
 
-All keybinds live in one place — [`Configs/hypr/keybinds.lua`](Configs/hypr/keybinds.lua) — grouped exactly as below. Every `qs -c noctis ipc call ...` target the shell exposes has a keybind; anything below not bound to a key is intentionally IPC-only (scriptable, but not meant to be memorized).
+All keybinds live in one place — [`Configs/hypr/keybinds.lua`](Configs/hypr/keybinds.lua) — grouped exactly as below. Every `qs -c aphotic ipc call ...` target the shell exposes has a keybind; anything below not bound to a key is intentionally IPC-only (scriptable, but not meant to be memorized).
 
 **Launcher** — see the [modes table](#quickshell-shell) above for what each prefix does inside it.
 
@@ -356,7 +356,7 @@ All keybinds live in one place — [`Configs/hypr/keybinds.lua`](Configs/hypr/ke
 | <kbd>Super</kbd> + <kbd>S</kbd> | Screenshot — simple region select via `grim`/`slurp`/`swappy`, no extra frills |
 | <kbd>Super</kbd> + <kbd>W</kbd> | Change wallpaper (random pick) — open the launcher and type `~` to pick a specific one instead |
 | <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>W</kbd> | Open the launcher's wallpaper picker directly |
-| <kbd>Super</kbd> + <kbd>,</kbd> / <kbd>Super</kbd> + <kbd>.</kbd> | Cycle to the previous/next theme — same as `noctis theme prev`/`next` |
+| <kbd>Super</kbd> + <kbd>,</kbd> / <kbd>Super</kbd> + <kbd>.</kbd> | Cycle to the previous/next theme — same as `aphotic theme prev`/`next` |
 
 **Quickshell surfaces**
 
@@ -422,11 +422,11 @@ All keybinds live in one place — [`Configs/hypr/keybinds.lua`](Configs/hypr/ke
 | <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>Tab</kbd> / <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Tab</kbd> | Cycle forward/backward through open special (scratchpad) workspaces |
 
 > [!NOTE]
-> Special workspaces aren't created by a Noctis keybind yet — cycling only does something once one exists (e.g. via `hyprctl dispatch movetoworkspace special:name`). A dedicated create/toggle bind is a small future addition, tracked in the [Roadmap](#roadmap).
+> Special workspaces aren't created by a Aphotic keybind yet — cycling only does something once one exists (e.g. via `hyprctl dispatch movetoworkspace special:name`). A dedicated create/toggle bind is a small future addition, tracked in the [Roadmap](#roadmap).
 
 ## Terminal Games
 
-Noctis includes some fun terminal-based games accessible through the `noctis play` command:
+Aphotic includes some fun terminal-based games accessible through the `aphotic play` command:
 
 - **Hangman**: Classic word-guessing game
 - **Snake**: Control a snake to eat food and grow longer
@@ -434,9 +434,9 @@ Noctis includes some fun terminal-based games accessible through the `noctis pla
 
 Play them with:
 ```bash
-noctis play hangman
-noctis play snake
-noctis play guess
+aphotic play hangman
+aphotic play snake
+aphotic play guess
 ```
 
 <div align="right"><a href="#-top">🡅 back to top</a></div>
@@ -445,12 +445,12 @@ noctis play guess
 
 ## Roadmap
 
-Noctis reached **v1.0** on `main` — the Quickshell shell, per-theme wallpapers, the unified theme/wallpaper/scheme state contract, and a CI-tested installer are the shipped baseline, not a work in progress. Active development continues on `test`:
+Aphotic reached **v1.0** on `main` — the Quickshell shell, per-theme wallpapers, the unified theme/wallpaper/scheme state contract, and a CI-tested installer are the shipped baseline, not a work in progress. Active development continues on `test`:
 
 - ~~**Identity** — a live bar-position toggle.~~ Shipped: Settings → Bar docks left/right and toggles compact density live.
 - ~~**Quickshell shell**~~ — ✅ shipped in full: bar with real popouts + a live resource meter, launcher with app/clipboard/emoji/window/wallpaper modes, screenshot picker, notifications, OSD, lock, session menu, Command Center (tabbed dashboard + AI Chat), and a full Settings Control Center — see [Quickshell Shell](#quickshell-shell) and [Settings](#settings--control-center) above.
 - ~~**Theming architecture**~~ — ✅ shipped: directory-per-theme wallpaper sets, tracked per-theme wallpaper state, and a wallpaper picker (Settings → Appearance) covering every theme in one grid.
-- **Shell restart supervision** — ✅ shipped: a `systemd --user` unit (`noctis-shell.service`) auto-restarts the Quickshell daemon on crash instead of requiring a manual `SUPER+B`.
+- **Shell restart supervision** — ✅ shipped: a `systemd --user` unit (`aphotic-shell.service`) auto-restarts the Quickshell daemon on crash instead of requiring a manual `SUPER+B`.
 - **`matugen` as a second color engine** — next up. `theme.toml` already reserves the config slot; wiring it in gives themes a real tonal-spot/vibrant/expressive variant picker alongside wallust.
 - ~~**AI settings pane**~~ — ✅ shipped: Settings → AI covers active provider, Ollama host/model, and masked API-key entry for Claude/Gemini/ChatGPT.
 - **Settings panel expansion** — the Control Center's architecture (one row component, one pane-per-category) is built to grow further: a System-updates action (distinct from the current read-only doctor output), a Theme-colors swatch view, and a Plugins category once a real plugin architecture exists to back it. Network/Audio/Bluetooth pages (matching the bar's existing popouts) are also planned.
@@ -471,7 +471,7 @@ Longer-term, the plan is a full wiki — install walkthroughs, theme authoring d
 <details>
 <summary><strong>Does this work outside Arch?</strong></summary>
 <br>
-Not currently by design. Noctis assumes Arch/AUR and leans on that assumption throughout the installer — no distro branching is planned.
+Not currently by design. Aphotic assumes Arch/AUR and leans on that assumption throughout the installer — no distro branching is planned.
 </details>
 
 <details>
@@ -499,8 +499,8 @@ Install the <a href="https://addons.mozilla.org/en-US/firefox/addon/pywalfox/">P
 ## Star History
 
 <p align="center">
-  <a href="https://star-history.com/#T-Crypt/Noctis-Hypr&Date">
-    <img src="https://api.star-history.com/svg?repos=T-Crypt/Noctis-Hypr&type=Date" width="600">
+  <a href="https://star-history.com/#T-Crypt/Aphotic-Hypr&Date">
+    <img src="https://api.star-history.com/svg?repos=T-Crypt/Aphotic-Hypr&type=Date" width="600">
   </a>
 </p>
 
@@ -508,7 +508,7 @@ Install the <a href="https://addons.mozilla.org/en-US/firefox/addon/pywalfox/">P
 
 ## Credit
 
-Inspired by and built with gratitude toward [Tittu](https://github.com/prasanthrangan)'s minimalist Hyprland dotfiles — Noctis started as a fork of that philosophy and has been growing its own identity ever since.
+Inspired by and built with gratitude toward [Tittu](https://github.com/prasanthrangan)'s minimalist Hyprland dotfiles — Aphotic started as a fork of that philosophy and has been growing its own identity ever since.
 
 <p align="center">
   <sub>after dark, always.</sub>
