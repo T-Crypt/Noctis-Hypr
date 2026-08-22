@@ -15,23 +15,24 @@ RowLayout {
         { id: "bar", icon: "dock_to_bottom", label: qsTr("Bar"), description: qsTr("Position, density") },
         { id: "clock", icon: "schedule", label: qsTr("Clock / Date"), description: qsTr("Format, desktop clock") },
         { id: "osd", icon: "notifications", label: qsTr("OSD / Notifications"), description: qsTr("Sliders, timeouts") },
+        { id: "ai", icon: "smart_toy", label: qsTr("AI"), description: qsTr("Provider, API keys") },
         { id: "system", icon: "monitor_heart", label: qsTr("System"), description: qsTr("Doctor, dependencies") },
         { id: "about", icon: "info", label: qsTr("About"), description: qsTr("Version, credits") }
     ]
 
-    width: 760
-    height: 480
+    width: 960
+    height: 560
     spacing: 0
 
     StyledRect {
         Layout.fillHeight: true
-        Layout.preferredWidth: 240
+        Layout.preferredWidth: 280
         radius: Tokens.rounding.extraLarge
         color: Colours.tPalette.m3surfaceContainer
 
         CategoryRail {
             anchors.fill: parent
-            anchors.margins: Tokens.padding.medium
+            anchors.margins: Tokens.padding.extraLarge
             currentCategory: root.currentCategory
             categories: root.categories
             onCategorySelected: id => root.currentCategory = id
@@ -50,57 +51,82 @@ RowLayout {
 
         property int _prevCategoryIndex: 0
 
-        Loader {
-            id: paneLoader
+        Flickable {
+            id: paneFlick
 
-            y: Tokens.padding.large
-            width: parent.width - Tokens.padding.large * 2
-            height: parent.height - Tokens.padding.large * 2
-            x: Tokens.padding.large
-            opacity: 1
+            anchors.fill: parent
+            anchors.margins: Tokens.padding.extraLarge
+            contentWidth: width
+            contentHeight: paneLoader.height
+            boundsBehavior: Flickable.StopAtBounds
+            clip: true
 
-            Behavior on opacity {
-                Anim { type: Anim.DefaultEffects }
-            }
-            Behavior on x {
-                Anim { type: Anim.Emphasized }
-            }
+            Loader {
+                id: paneLoader
 
-            sourceComponent: {
-                switch (root.currentCategory) {
-                case "bar":
-                    return barComp;
-                case "clock":
-                    return clockComp;
-                case "osd":
-                    return osdComp;
-                case "system":
-                    return systemComp;
-                case "about":
-                    return aboutComp;
-                default:
-                    return appearanceComp;
+                width: paneFlick.width
+                height: Math.max(paneFlick.height, paneLoader.item ? paneLoader.item.implicitHeight : 0)
+                opacity: 1
+
+                Behavior on opacity {
+                    Anim { type: Anim.DefaultEffects }
+                }
+                Behavior on x {
+                    Anim { type: Anim.Emphasized }
+                }
+
+                sourceComponent: {
+                    switch (root.currentCategory) {
+                    case "bar":
+                        return barComp;
+                    case "clock":
+                        return clockComp;
+                    case "osd":
+                        return osdComp;
+                    case "ai":
+                        return aiComp;
+                    case "system":
+                        return systemComp;
+                    case "about":
+                        return aboutComp;
+                    default:
+                        return appearanceComp;
+                    }
+                }
+
+                onSourceComponentChanged: {
+                    const newIndex = root.categories.findIndex(c => c.id === root.currentCategory);
+                    const direction = newIndex >= paneSurface._prevCategoryIndex ? 1 : -1;
+                    paneSurface._prevCategoryIndex = newIndex;
+
+                    opacity = 0;
+                    x = direction * 24;
+                    paneFlick.contentY = 0;
+                    slideInTimer.restart();
+                }
+
+                Timer {
+                    id: slideInTimer
+                    interval: 1
+                    onTriggered: {
+                        paneLoader.opacity = 1;
+                        paneLoader.x = 0;
+                    }
                 }
             }
+        }
 
-            onSourceComponentChanged: {
-                const newIndex = root.categories.findIndex(c => c.id === root.currentCategory);
-                const direction = newIndex >= paneSurface._prevCategoryIndex ? 1 : -1;
-                paneSurface._prevCategoryIndex = newIndex;
+        StyledRect {
+            id: scrollThumb
 
-                opacity = 0;
-                x = Tokens.padding.large + direction * 24;
-                slideInTimer.restart();
-            }
-
-            Timer {
-                id: slideInTimer
-                interval: 1
-                onTriggered: {
-                    paneLoader.opacity = 1;
-                    paneLoader.x = Tokens.padding.large;
-                }
-            }
+            visible: paneFlick.contentHeight > paneFlick.height
+            x: paneFlick.x + paneFlick.width - width
+            y: paneFlick.y + paneFlick.visibleArea.yPosition * paneFlick.height
+            width: 4
+            height: Math.max(24, paneFlick.visibleArea.heightRatio * paneFlick.height)
+            radius: Tokens.rounding.full
+            color: Colours.palette.m3onSurfaceVariant
+            opacity: 0.35
         }
     }
 
@@ -119,6 +145,10 @@ RowLayout {
     Component {
         id: osdComp
         OsdPane {}
+    }
+    Component {
+        id: aiComp
+        AiPane {}
     }
     Component {
         id: systemComp

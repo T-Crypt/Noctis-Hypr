@@ -58,13 +58,13 @@ Waybar, Mako, Swaylock, and Rofi have all been fully retired in favor of one han
 | Bar | Waybar | Dockable left or right, standard or compact density (Settings → Bar) — workspaces, active window, tray, clock, status icons, power button, all with real hover popouts (see below) |
 | Bar popouts | — (new) | Hover any status icon, the tray, or the active window pill for a real detail panel — volume slider + output picker, Wi-Fi list, Bluetooth devices, battery + power profile, full window title, keyboard layout, lock state, live CPU/GPU/memory/disk/network meter |
 | Launcher | Rofi (drun, clipboard, emoji, wallpaper) | One search box, mode switched by a prefix — see the table below |
-| Screenshot picker | `grim`/`slurp` combo scripts | Drag-select a region with live client-window snapping and a freeze-mode preview, `SUPER+S` still works standalone too |
-| Notifications | Mako | Popup toasts, top-right |
+| Screenshot picker | `grim`/`slurp` combo scripts | Drag-select a region with live client-window snapping and a freeze-mode preview — `SUPER+Shift+S` (see [Keybindings](#keybindings) for the freeze/clipboard variants); the plain `grim`/`slurp`/`swappy` combo stays on `SUPER+S` |
+| Notifications | Mako | Popup toasts, top-right — `SUPER+Shift+N` clears them all |
 | OSD | — (new) | Volume/mic/brightness popups on change, enable flags and hide-delay configurable in Settings |
 | Lock screen | Swaylock | Real `ext-session-lock-v1` + real PAM auth via the system's own `/etc/pam.d/swaylock` service — `SUPER+L` |
 | Session/power menu | Rofi's powermenu | Lock, suspend, log out, hibernate, reboot, shut down — `SUPER+Backspace` |
-| Command Center | — (new) | Tabbed dashboard overlay — Dashboard (clock/calendar/media), Performance (live CPU/GPU/memory/storage/network cards), Workspaces (numbered grid, click to jump), AI Chat (Claude/Ollama/Gemini/ChatGPT, see below) — `qs -c noctis ipc call dashboard toggle` |
-| Settings | — (new) | Full-screen Control Center — searchable category rail (Appearance, Bar, Clock/Date, OSD/Notifications, System, About), cross-theme wallpaper picker, live doctor output — `qs -c noctis ipc call settings toggle` |
+| Command Center | — (new) | Tabbed dashboard overlay — Dashboard (clock/calendar/media), Performance (live CPU/GPU/memory/storage/network cards), Workspaces (numbered grid, click to jump), AI Chat (Claude/Ollama/Gemini/ChatGPT, see below) — `SUPER+D` |
+| Settings | — (new) | Full-screen Control Center — searchable category rail (Appearance, Bar, Clock/Date, OSD/Notifications, AI, System, About), cross-theme wallpaper picker, live doctor output — `SUPER+I` |
 
 Every module is a thin, deliberately-scoped-down rewrite of its caelestia counterpart, not a faithful port — things needing caelestia's own native plugin (fingerprint/face auth, a calculator, Material-You scheme switching) were left out in favor of what Noctis actually needs; the resource-meter and dashboard gaps that plugin would otherwise cover are hand-implemented instead (see Performance/System above), not skipped.
 
@@ -95,18 +95,19 @@ The Command Center's AI Chat tab talks to four providers behind one interface: *
 
 ## Settings — Control Center
 
-`qs -c noctis ipc call settings toggle` opens a full-screen panel — a searchable category rail on the left, the selected category's controls on the right, sliding between them instead of a flat crossfade:
+`SUPER+I` (or `qs -c noctis ipc call settings toggle`) opens a full-screen panel — a searchable, scrollable category rail on the left, the selected category's controls on the right, sliding between them instead of a flat crossfade:
 
 | Category | What's in it |
 |---|---|
-| Appearance | Theme grid, wallpaper-in-active-theme quick picker, and a **Browse all wallpapers** grid spanning every theme (click any thumbnail to switch theme + wallpaper + colorscheme together) |
+| Appearance | Theme grid (fills the available space, not a fixed-size row), wallpaper-in-active-theme quick picker, and a **Browse all wallpapers** grid spanning every theme (click any thumbnail to switch theme + wallpaper + colorscheme together) |
 | Bar | Dock left/right, compact density (vertical orientation is planned, shown disabled for now) |
 | Clock / Date | 12-hour clock, show date in bar clock, desktop clock |
 | OSD / Notifications | Show/hide OSD, brightness/mic sliders, OSD hide delay, notification timeout |
+| AI | Active provider (Ollama/Claude/Gemini/ChatGPT), live Ollama host + model picker, masked API-key entry for each provider — same backend as the Command Center's AI Chat tab |
 | System | Live `noctis doctor` output — dependency and path checks, daemon status |
-| About | Version (read from `VERSION`), repo link, wallpaper art credits |
+| About | Real Noctis logo, version (read from `VERSION`), repo link, wallpaper art credits |
 
-Every toggle here persists to `~/.local/state/noctis/settings.json` and survives a shell restart. Adding a new setting is a data addition to an existing pane, not new UI — every row shares one component (`SettingsRow`) for the icon-badge/title/description/control layout.
+Every toggle here persists to `~/.local/state/noctis/settings.json` and survives a shell restart. Adding a new setting is a data addition to an existing pane, not new UI — every row shares one component (`SettingsRow`, grouped into connected-card sections by `SettingsGroup`) for the icon-badge/title/description/control layout. Pane content and the category rail both scroll independently once they outgrow the panel, so a long pane never gets clipped.
 
 <p align="center">
   <img src="./assets/quickshell-settings.png" width="49%">
@@ -234,12 +235,12 @@ Noctis-Hypr/
     ├── quickshell/noctis/        Hand-vendored Quickshell shell (see below)
     │   ├── config/                Tokens/Config/GlobalConfig singletons (hand-written, no native plugin)
     │   ├── services/               Colours (wallust-generated), Audio, Hypr, Players, Notifs, ...
-    │   │   └── ai/                   AiConfig/AiKeys/AiProviders — Command Center's AI Chat backend
+    │   │   └── ai/                   AiConfig/AiKeys/AiProviders — Command Center's AI Chat + Settings → AI backend
     │   ├── components/             Shared UI primitives (StyledText, MaterialIcon, StateLayer,
-    │   │                            SettingsRow/SettingsToggleRow/SettingsPresetRow, ...)
+    │   │                            SettingsRow/SettingsGroup/SettingsToggleRow/SettingsPresetRow, Logo, ...)
     │   └── modules/                bar/ (+ real popouts), launcher/ (apps/clip/emoji/windows/wallpaper),
     │                                areapicker/, notifications/, osd/, lock/, session/,
-    │                                dashboard/ (Command Center), settings/ (Control Center)
+    │                                dashboard/ (Command Center), settings/ (Control Center, 7 panes)
     ├── hypr/                     hyprland.lua, keybinds.lua, custom.lua (never overwritten, see below)
     └── .local/
         ├── bin/noctis            noctis CLI entry point, symlinked onto PATH by install.sh
@@ -336,7 +337,7 @@ The system automatically tracks your current theme and wallpaper state, enabling
 
 ## Keybindings
 
-All keybinds live in one place — [`Configs/hypr/keybinds.lua`](Configs/hypr/keybinds.lua) — grouped exactly as below.
+All keybinds live in one place — [`Configs/hypr/keybinds.lua`](Configs/hypr/keybinds.lua) — grouped exactly as below. Every `qs -c noctis ipc call ...` target the shell exposes has a keybind; anything below not bound to a key is intentionally IPC-only (scriptable, but not meant to be memorized).
 
 **Launcher** — see the [modes table](#quickshell-shell) above for what each prefix does inside it.
 
@@ -352,31 +353,61 @@ All keybinds live in one place — [`Configs/hypr/keybinds.lua`](Configs/hypr/ke
 | <kbd>Super</kbd> + <kbd>E</kbd> | Launch Thunar |
 | <kbd>Super</kbd> + <kbd>C</kbd> | Launch VS Code |
 | <kbd>Super</kbd> + <kbd>F</kbd> | Launch Firefox |
-| <kbd>Super</kbd> + <kbd>S</kbd> | Screenshot — region select via `grim`/`slurp`/`swappy`. The Quickshell picker (drag-select with client snapping + freeze preview) is available via `qs -c noctis ipc call picker open` |
+| <kbd>Super</kbd> + <kbd>S</kbd> | Screenshot — simple region select via `grim`/`slurp`/`swappy`, no extra frills |
 | <kbd>Super</kbd> + <kbd>W</kbd> | Change wallpaper (random pick) — open the launcher and type `~` to pick a specific one instead |
 | <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>W</kbd> | Open the launcher's wallpaper picker directly |
 | <kbd>Super</kbd> + <kbd>,</kbd> / <kbd>Super</kbd> + <kbd>.</kbd> | Cycle to the previous/next theme — same as `noctis theme prev`/`next` |
 
-**Shell (Quickshell)**
+**Quickshell surfaces**
 
 | Keys | Action |
 | :-- | :-- |
+| <kbd>Super</kbd> + <kbd>D</kbd> | Command Center (tabbed dashboard overlay) |
+| <kbd>Super</kbd> + <kbd>I</kbd> | Settings Control Center |
+| <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> | Clear all notifications |
 | <kbd>Super</kbd> + <kbd>L</kbd> | Lock screen |
 | <kbd>Super</kbd> + <kbd>Backspace</kbd> | Session / power menu — lock, suspend, log out, hibernate, reboot, shut down |
 | <kbd>Super</kbd> + <kbd>M</kbd> | `wlogout` (fallback power menu) |
 | <kbd>Super</kbd> + <kbd>B</kbd> | Restart Quickshell |
 
+**Screen capture** — the real Quickshell picker (drag-select with live client-window snapping and a freeze-mode preview), distinct from the plain <kbd>Super</kbd> + <kbd>S</kbd> script above:
+
+| Keys | Action |
+| :-- | :-- |
+| <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> | Open the picker |
+| <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>S</kbd> | Open the picker in freeze-mode (screen freezes first, then select) |
+| <kbd>Super</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd> | Open the picker, copy to clipboard only (no file saved) |
+| <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd> | Freeze-mode + clipboard-only combined |
+
+**Media, audio & brightness**
+
+| Keys | Action |
+| :-- | :-- |
+| <kbd>XF86AudioPlay</kbd> / <kbd>XF86AudioPause</kbd> | Play/pause the active MPRIS player |
+| <kbd>XF86AudioNext</kbd> / <kbd>XF86AudioPrev</kbd> | Next/previous track |
+| <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>O</kbd> | Cycle audio output device |
+| <kbd>XF86AudioRaiseVolume</kbd> / <kbd>XF86AudioLowerVolume</kbd> | Volume up/down |
+| <kbd>XF86AudioMute</kbd> | Toggle mute |
+| <kbd>XF86AudioMicMute</kbd> | Toggle mic mute |
+| <kbd>XF86MonBrightnessUp</kbd> / <kbd>XF86MonBrightnessDown</kbd> | Brightness up/down |
+
 **Windows & layout**
 
 | Keys | Action |
 | :-- | :-- |
-| <kbd>Super</kbd> + <kbd>Q</kbd> | Quit the focused window |
+| <kbd>Super</kbd> + <kbd>Q</kbd> | Close the focused window |
+| <kbd>Super</kbd> + <kbd>Alt</kbd> + <kbd>Q</kbd> | Force-kill the focused window |
 | <kbd>Super</kbd> + <kbd>V</kbd> | Toggle floating |
 | <kbd>Super</kbd> + <kbd>P</kbd> | Toggle pseudo-tiling |
+| <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>F</kbd> | Toggle pin (keep window on every workspace) |
 | <kbd>Super</kbd> + <kbd>J</kbd> | Toggle split direction |
-| <kbd>Super</kbd> + <kbd>G</kbd> | Toggle group |
 | <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd> | Toggle fullscreen |
 | <kbd>Super</kbd> + <kbd>&larr;</kbd>/<kbd>&rarr;</kbd>/<kbd>&uarr;</kbd>/<kbd>&darr;</kbd> | Move focus between windows |
+| <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>&larr;</kbd>/<kbd>&rarr;</kbd>/<kbd>&uarr;</kbd>/<kbd>&darr;</kbd> | Move (swap) the focused window in a direction |
+| <kbd>Alt</kbd> + <kbd>Tab</kbd> | Cycle to the next window |
+| <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>Tab</kbd> | Cycle to the previous window |
+| <kbd>Super</kbd> + <kbd>G</kbd> | Toggle group |
+| <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>H</kbd> / <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>L</kbd> | Cycle group tabs backward/forward |
 | <kbd>Super</kbd> + <kbd>LMB</kbd> drag | Move window |
 | <kbd>Super</kbd> + <kbd>RMB</kbd> drag | Resize window |
 
@@ -387,15 +418,11 @@ All keybinds live in one place — [`Configs/hypr/keybinds.lua`](Configs/hypr/ke
 | <kbd>Super</kbd> + <kbd>0</kbd>–<kbd>9</kbd> | Switch to workspace |
 | <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>0</kbd>–<kbd>9</kbd> | Move window to workspace |
 | <kbd>Super</kbd> + Scroll | Cycle workspaces |
+| <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>&darr;</kbd> | Jump to the nearest empty workspace |
+| <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>Tab</kbd> / <kbd>Super</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Tab</kbd> | Cycle forward/backward through open special (scratchpad) workspaces |
 
-**Media & brightness** *(laptop keys)*
-
-| Keys | Action |
-| :-- | :-- |
-| <kbd>XF86AudioRaiseVolume</kbd> / <kbd>XF86AudioLowerVolume</kbd> | Volume up/down |
-| <kbd>XF86AudioMute</kbd> | Toggle mute |
-| <kbd>XF86AudioMicMute</kbd> | Toggle mic mute |
-| <kbd>XF86MonBrightnessUp</kbd> / <kbd>XF86MonBrightnessDown</kbd> | Brightness up/down |
+> [!NOTE]
+> Special workspaces aren't created by a Noctis keybind yet — cycling only does something once one exists (e.g. via `hyprctl dispatch movetoworkspace special:name`). A dedicated create/toggle bind is a small future addition, tracked in the [Roadmap](#roadmap).
 
 ## Terminal Games
 
@@ -425,7 +452,9 @@ Noctis reached **v1.0** on `main` — the Quickshell shell, per-theme wallpapers
 - ~~**Theming architecture**~~ — ✅ shipped: directory-per-theme wallpaper sets, tracked per-theme wallpaper state, and a wallpaper picker (Settings → Appearance) covering every theme in one grid.
 - **Shell restart supervision** — ✅ shipped: a `systemd --user` unit (`noctis-shell.service`) auto-restarts the Quickshell daemon on crash instead of requiring a manual `SUPER+B`.
 - **`matugen` as a second color engine** — next up. `theme.toml` already reserves the config slot; wiring it in gives themes a real tonal-spot/vibrant/expressive variant picker alongside wallust.
-- **Settings panel expansion** — the Control Center's architecture (one row component, one pane-per-category) is built to grow: AI provider settings, a System-updates action (distinct from the current read-only doctor output), and a plugin category once a real plugin architecture exists to back it.
+- ~~**AI settings pane**~~ — ✅ shipped: Settings → AI covers active provider, Ollama host/model, and masked API-key entry for Claude/Gemini/ChatGPT.
+- **Settings panel expansion** — the Control Center's architecture (one row component, one pane-per-category) is built to grow further: a System-updates action (distinct from the current read-only doctor output), a Theme-colors swatch view, and a Plugins category once a real plugin architecture exists to back it. Network/Audio/Bluetooth pages (matching the bar's existing popouts) are also planned.
+- **Keyboard scratchpad workflow** — `SUPER+Ctrl+Tab` already cycles between open special workspaces, but nothing yet creates/toggles one from the keyboard; a dedicated create/toggle bind is a small follow-up.
 - **Bar orientation** — a true vertical-bar mode, distinct from the already-shipped left/right dock toggle.
 - **Gaming profile** — a real performance-mode toggle, MangoHud bar integration, Proton/Steam polish.
 - **Dev environment** — deeper terminal and editor tooling, AI CLI workflow integration on top of the `ai` layer (the Command Center's AI Chat tab now covers the interactive side of this).

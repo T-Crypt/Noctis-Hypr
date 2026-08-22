@@ -54,13 +54,27 @@ PanelWindow {
     }
 
     BarWrapper {
+        id: barWrapper
+
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.left: !Settings.barPositionRight ? parent.left : undefined
-        anchors.right: Settings.barPositionRight ? parent.right : undefined
+        anchors.left: parent.left
         screen: root.screen
         screenState: root.screenState
         popouts: root.popouts
         fullscreen: false
+
+        // See BarWrapper.qml's own background/content anchors for why this
+        // is States + AnchorChanges rather than a ternary-to-undefined.
+        states: State {
+            name: "right"
+            when: Settings.barPositionRight
+
+            AnchorChanges {
+                target: barWrapper
+                anchors.left: undefined
+                anchors.right: root.right
+            }
+        }
     }
 }

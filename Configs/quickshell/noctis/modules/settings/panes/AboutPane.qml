@@ -14,6 +14,12 @@ ColumnLayout {
 
     spacing: Tokens.spacing.medium
 
+    Logo {
+        Layout.bottomMargin: Tokens.spacing.small
+        implicitWidth: 96
+        implicitHeight: 96 * designHeight / designWidth
+    }
+
     StyledText {
         text: "Noctis-Hypr"
         color: Colours.palette.m3onSurface

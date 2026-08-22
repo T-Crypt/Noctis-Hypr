@@ -50,6 +50,7 @@ Item {
 
             GridLayout {
                 Layout.fillWidth: true
+                Layout.fillHeight: true
                 columns: 3
                 columnSpacing: Tokens.spacing.medium
                 rowSpacing: Tokens.spacing.medium
@@ -65,8 +66,9 @@ Item {
                         required property var modelData
                         readonly property bool active: themeCard.modelData.name === Themes.activeTheme
 
-                        Layout.preferredWidth: 140
-                        Layout.preferredHeight: 56
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.minimumHeight: 56
                         radius: Tokens.rounding.medium
                         color: themeCard.active ? Colours.layer(Colours.tPalette.m3surfaceContainer, 2) : Colours.tPalette.m3surfaceContainer
                         border.width: themeCard.active ? 2 : 0

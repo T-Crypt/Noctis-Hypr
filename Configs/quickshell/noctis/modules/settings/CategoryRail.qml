@@ -62,119 +62,148 @@ ColumnLayout {
         }
     }
 
-    ColumnLayout {
-        id: list
+    Item {
+        id: listArea
 
         Layout.fillWidth: true
         Layout.fillHeight: true
-        spacing: 0
 
-        Repeater {
-            model: ScriptModel {
-                values: root.filteredCategories
-            }
+        Flickable {
+            id: listFlick
 
-            StyledRect {
-                id: categoryButton
+            anchors.fill: parent
+            contentWidth: width
+            contentHeight: list.implicitHeight
+            boundsBehavior: Flickable.StopAtBounds
+            clip: true
 
-                required property var modelData
-                required property int index
+            ColumnLayout {
+                id: list
 
-                readonly property bool active: categoryButton.modelData.id === root.currentCategory
-                readonly property bool isFirst: categoryButton.index === 0
-                readonly property bool isLast: categoryButton.index === root.filteredCategories.length - 1
+                width: listFlick.width
+                spacing: 0
 
-                Layout.fillWidth: true
-                implicitHeight: rowContent.implicitHeight + Tokens.padding.medium * 2
-
-                color: categoryButton.active ? Colours.palette.m3secondaryContainer : Colours.layer(Colours.tPalette.m3surfaceContainer, 2)
-
-                topLeftRadius: stateLayer.pressed ? Tokens.rounding.medium : categoryButton.active ? Tokens.rounding.extraLargeIncreased : categoryButton.isFirst ? Tokens.rounding.extraLarge : Tokens.rounding.extraSmall
-                topRightRadius: stateLayer.pressed ? Tokens.rounding.medium : categoryButton.active ? Tokens.rounding.extraLargeIncreased : categoryButton.isFirst ? Tokens.rounding.extraLarge : Tokens.rounding.extraSmall
-                bottomLeftRadius: stateLayer.pressed ? Tokens.rounding.medium : categoryButton.active ? Tokens.rounding.extraLargeIncreased : categoryButton.isLast ? Tokens.rounding.extraLarge : Tokens.rounding.extraSmall
-                bottomRightRadius: stateLayer.pressed ? Tokens.rounding.medium : categoryButton.active ? Tokens.rounding.extraLargeIncreased : categoryButton.isLast ? Tokens.rounding.extraLarge : Tokens.rounding.extraSmall
-
-                Behavior on color {
-                    CAnim {}
-                }
-                Behavior on topLeftRadius {
-                    Anim { type: Anim.DefaultEffects }
-                }
-                Behavior on topRightRadius {
-                    Anim { type: Anim.DefaultEffects }
-                }
-                Behavior on bottomLeftRadius {
-                    Anim { type: Anim.DefaultEffects }
-                }
-                Behavior on bottomRightRadius {
-                    Anim { type: Anim.DefaultEffects }
-                }
-
-                RowLayout {
-                    id: rowContent
-
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.margins: Tokens.padding.large
-                    spacing: Tokens.spacing.medium
+                Repeater {
+                    model: ScriptModel {
+                        values: root.filteredCategories
+                    }
 
                     StyledRect {
-                        Layout.fillHeight: true
-                        Layout.topMargin: -1
-                        Layout.bottomMargin: -1
-                        implicitWidth: height
-                        radius: Tokens.rounding.full
-                        color: categoryButton.active ? Colours.palette.m3primary : Colours.palette.m3secondaryContainer
+                        id: categoryButton
+
+                        required property var modelData
+                        required property int index
+
+                        readonly property bool active: categoryButton.modelData.id === root.currentCategory
+                        readonly property bool isFirst: categoryButton.index === 0
+                        readonly property bool isLast: categoryButton.index === root.filteredCategories.length - 1
+
+                        Layout.fillWidth: true
+                        implicitHeight: rowContent.implicitHeight + Tokens.padding.medium * 2
+
+                        color: categoryButton.active ? Colours.palette.m3secondaryContainer : Colours.layer(Colours.tPalette.m3surfaceContainer, 2)
+
+                        topLeftRadius: stateLayer.pressed ? Tokens.rounding.medium : categoryButton.active ? Tokens.rounding.extraLarge : categoryButton.isFirst ? Tokens.rounding.extraLarge : Tokens.rounding.extraSmall
+                        topRightRadius: stateLayer.pressed ? Tokens.rounding.medium : categoryButton.active ? Tokens.rounding.extraLarge : categoryButton.isFirst ? Tokens.rounding.extraLarge : Tokens.rounding.extraSmall
+                        bottomLeftRadius: stateLayer.pressed ? Tokens.rounding.medium : categoryButton.active ? Tokens.rounding.extraLarge : categoryButton.isLast ? Tokens.rounding.extraLarge : Tokens.rounding.extraSmall
+                        bottomRightRadius: stateLayer.pressed ? Tokens.rounding.medium : categoryButton.active ? Tokens.rounding.extraLarge : categoryButton.isLast ? Tokens.rounding.extraLarge : Tokens.rounding.extraSmall
 
                         Behavior on color {
                             CAnim {}
                         }
+                        Behavior on topLeftRadius {
+                            Anim { type: Anim.DefaultEffects }
+                        }
+                        Behavior on topRightRadius {
+                            Anim { type: Anim.DefaultEffects }
+                        }
+                        Behavior on bottomLeftRadius {
+                            Anim { type: Anim.DefaultEffects }
+                        }
+                        Behavior on bottomRightRadius {
+                            Anim { type: Anim.DefaultEffects }
+                        }
 
-                        MaterialIcon {
-                            anchors.centerIn: parent
-                            text: categoryButton.modelData.icon
-                            color: categoryButton.active ? Colours.contrastOn(Colours.palette.m3primary) : Colours.palette.m3onSecondaryContainer
-                            fontStyle: Tokens.font.icon.builders.medium.weight(Font.Medium).build()
-                            fill: categoryButton.active ? 1 : 0
+                        RowLayout {
+                            id: rowContent
+
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.margins: Tokens.padding.large
+                            spacing: Tokens.spacing.medium
+
+                            StyledRect {
+                                Layout.fillHeight: true
+                                Layout.topMargin: -1
+                                Layout.bottomMargin: -1
+                                implicitWidth: height
+                                radius: Tokens.rounding.full
+                                color: categoryButton.active ? Colours.palette.m3primary : Colours.palette.m3secondaryContainer
+
+                                Behavior on color {
+                                    CAnim {}
+                                }
+
+                                MaterialIcon {
+                                    anchors.centerIn: parent
+                                    text: categoryButton.modelData.icon
+                                    color: categoryButton.active ? Colours.contrastOn(Colours.palette.m3primary) : Colours.palette.m3onSecondaryContainer
+                                    fontStyle: Tokens.font.icon.builders.medium.weight(Font.Medium).build()
+                                    fill: categoryButton.active ? 1 : 0
+                                }
+                            }
+
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 0
+
+                                StyledText {
+                                    Layout.fillWidth: true
+                                    text: categoryButton.modelData.label
+                                    font: Tokens.font.body.medium
+                                    elide: Text.ElideRight
+                                }
+
+                                StyledText {
+                                    Layout.fillWidth: true
+                                    visible: (categoryButton.modelData.description ?? "").length > 0
+                                    text: categoryButton.modelData.description ?? ""
+                                    color: Colours.palette.m3onSurfaceVariant
+                                    font: Tokens.font.label.small
+                                    elide: Text.ElideRight
+                                }
+                            }
+                        }
+
+                        StateLayer {
+                            id: stateLayer
+
+                            anchors.fill: parent
+                            topLeftRadius: categoryButton.topLeftRadius
+                            topRightRadius: categoryButton.topRightRadius
+                            bottomLeftRadius: categoryButton.bottomLeftRadius
+                            bottomRightRadius: categoryButton.bottomRightRadius
+                            showHoverBackground: !categoryButton.active
+
+                            onClicked: root.categorySelected(categoryButton.modelData.id)
                         }
                     }
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 0
-
-                        StyledText {
-                            Layout.fillWidth: true
-                            text: categoryButton.modelData.label
-                            font: Tokens.font.body.medium
-                            elide: Text.ElideRight
-                        }
-
-                        StyledText {
-                            Layout.fillWidth: true
-                            visible: (categoryButton.modelData.description ?? "").length > 0
-                            text: categoryButton.modelData.description ?? ""
-                            color: Colours.palette.m3onSurfaceVariant
-                            font: Tokens.font.label.small
-                            elide: Text.ElideRight
-                        }
-                    }
-                }
-
-                StateLayer {
-                    id: stateLayer
-
-                    anchors.fill: parent
-                    topLeftRadius: categoryButton.topLeftRadius
-                    topRightRadius: categoryButton.topRightRadius
-                    bottomLeftRadius: categoryButton.bottomLeftRadius
-                    bottomRightRadius: categoryButton.bottomRightRadius
-                    showHoverBackground: !categoryButton.active
-
-                    onClicked: root.categorySelected(categoryButton.modelData.id)
                 }
             }
+        }
+
+        StyledRect {
+            id: railScrollThumb
+
+            visible: listFlick.contentHeight > listFlick.height
+            anchors.right: parent.right
+            y: listFlick.visibleArea.yPosition * listFlick.height
+            width: 3
+            height: Math.max(24, listFlick.visibleArea.heightRatio * listFlick.height)
+            radius: Tokens.rounding.full
+            color: Colours.palette.m3onSurfaceVariant
+            opacity: 0.35
         }
     }
 

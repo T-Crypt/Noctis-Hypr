@@ -25,6 +25,7 @@ StyledRect {
 
     Layout.fillWidth: true
     Layout.preferredHeight: rowLayout.implicitHeight + Tokens.padding.medium * 2
+    implicitHeight: rowLayout.implicitHeight + Tokens.padding.medium * 2
 
     color: Colours.layer(Colours.tPalette.m3surfaceContainer, 2)
     topLeftRadius: root.first ? Tokens.rounding.extraLarge : Tokens.rounding.extraSmall

@@ -79,18 +79,40 @@ Item {
     // docked right (screen edge is parent.right instead). This keeps the
     // visible strip flush against the true screen edge in both modes as
     // root's implicitWidth animates.
+    //
+    // Anchors are swapped via States + AnchorChanges rather than a plain
+    // `anchors.left: cond ? parent.left : undefined` ternary -- the plain
+    // ternary form left a stale anchor active after a round-trip toggle
+    // (dock left -> right -> left), so both anchors.left AND anchors.right
+    // ended up bound simultaneously. QtQuick derives width from the span
+    // between two active anchors, silently overriding the explicit
+    // `width: root.implicitWidth` below and blowing the bar up into a
+    // huge pill spanning most of the window. AnchorChanges is the
+    // Qt-documented way to reassign anchor lines reactively without this
+    // failure mode -- it cleanly reverts the previous state's anchors
+    // instead of relying on a binding evaluating to `undefined`.
     StyledRect {
         id: background
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.right: !Settings.barPositionRight ? parent.right : undefined
-        anchors.left: Settings.barPositionRight ? parent.left : undefined
+        anchors.right: parent.right
         width: root.implicitWidth
 
         radius: Tokens.rounding.full
         color: Colours.tPalette.m3surfaceContainer
         visible: root.shouldBeVisible
+
+        states: State {
+            name: "right"
+            when: Settings.barPositionRight
+
+            AnchorChanges {
+                target: background
+                anchors.right: undefined
+                anchors.left: root.left
+            }
+        }
     }
 
     Loader {
@@ -98,8 +120,7 @@ Item {
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.right: !Settings.barPositionRight ? parent.right : undefined
-        anchors.left: Settings.barPositionRight ? parent.left : undefined
+        anchors.right: parent.right
 
         active: root.shouldBeVisible
 
@@ -109,6 +130,17 @@ Item {
             screenState: root.screenState
             popouts: root.popouts // qmllint disable incompatible-type
             fullscreen: root.fullscreen
+        }
+
+        states: State {
+            name: "right"
+            when: Settings.barPositionRight
+
+            AnchorChanges {
+                target: content
+                anchors.right: undefined
+                anchors.left: root.left
+            }
         }
     }
 
