@@ -26,6 +26,13 @@ fi
 
 QUICKSHELL_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/quickshell/aphotic"
 
+# one-time migration: noctis -> aphotic config path
+_APHOTIC_OLD_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/noctis"
+if [[ -d "$_APHOTIC_OLD_CONFIG_HOME" ]] && [[ ! -e "$APHOTIC_CONFIG_HOME" ]]; then
+    mv "$_APHOTIC_OLD_CONFIG_HOME" "$APHOTIC_CONFIG_HOME"
+    echo "[aphotic] migrated config from ${_APHOTIC_OLD_CONFIG_HOME}" >&2
+fi
+
 mkdir -p "$APHOTIC_CONFIG_HOME" "$APHOTIC_STATE_HOME" "$APHOTIC_DATA_HOME" \
          "$APHOTIC_RUNTIME_DIR" "$APHOTIC_BACKUP_DIR"
 
